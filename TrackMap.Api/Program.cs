@@ -1,25 +1,32 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using TrackMap.Api.Data;
+using TrackMap.Api.Extensions;
+using TrackMap.Api.Options;
+using TrackMap.Api.Repositories;
+using TrackMap.Api.Repositories.Implements;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+builder.Services.ConfigureOptions<DatabaseOptionsSetup>();
+builder.Services.AddDbContext<TrackMapDbContext>((p, o) => o.UseSqlServer(p.GetService<IOptions<DatabaseOptions>>()?.Value.ConnectionString));
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IDeviceRepository, DeviceRepository>();
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    _ = app.UseSwagger();
+    _ = app.UseSwaggerUI();
 }
 
+app.MigrateDbContext<TrackMapDbContext>((c, s) => new TrackMapDbContextSeed().SeedAsync(s.GetService<ILogger<TrackMapDbContextSeed>>()!, c).Wait());
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

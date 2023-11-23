@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackMap", "TrackMap\TrackM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackMap.Api", "TrackMap.Api\TrackMap.Api.csproj", "{510E6144-42FC-4691-9BF7-142E61792275}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackMap.Common", "TrackMap.Common\TrackMap.Common.csproj", "{C2878094-2216-4F07-97EE-521631F57640}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{510E6144-42FC-4691-9BF7-142E61792275}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{510E6144-42FC-4691-9BF7-142E61792275}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{510E6144-42FC-4691-9BF7-142E61792275}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2878094-2216-4F07-97EE-521631F57640}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2878094-2216-4F07-97EE-521631F57640}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2878094-2216-4F07-97EE-521631F57640}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2878094-2216-4F07-97EE-521631F57640}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
