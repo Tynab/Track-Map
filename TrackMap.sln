@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34302.85
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackMap", "TrackMap\TrackMap.csproj", "{3C2FD7ED-EE9E-4A95-90DC-F8FCF65F8A07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackMap.Api", "TrackMap.Api\TrackMap.Api.csproj", "{510E6144-42FC-4691-9BF7-142E61792275}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3C2FD7ED-EE9E-4A95-90DC-F8FCF65F8A07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C2FD7ED-EE9E-4A95-90DC-F8FCF65F8A07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C2FD7ED-EE9E-4A95-90DC-F8FCF65F8A07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C2FD7ED-EE9E-4A95-90DC-F8FCF65F8A07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{510E6144-42FC-4691-9BF7-142E61792275}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{510E6144-42FC-4691-9BF7-142E61792275}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{510E6144-42FC-4691-9BF7-142E61792275}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{510E6144-42FC-4691-9BF7-142E61792275}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EC0DDA77-E6F2-4589-BC60-832BBDAAF95B}
+	EndGlobalSection
+EndGlobal
