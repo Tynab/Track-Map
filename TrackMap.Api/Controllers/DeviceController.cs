@@ -78,13 +78,6 @@ public sealed class DeviceController : ControllerBase
     {
         try
         {
-            //var validator = request.IsValid();
-
-            //if (!validator.Item1)
-            //{
-            //    return BadRequest(validator.Item2);
-            //}
-
             if (await _userRepository.Get(request.CreatedBy) is null)
             {
                 return NotFound(new

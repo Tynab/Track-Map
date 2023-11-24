@@ -154,7 +154,7 @@ public sealed class UserController : ControllerBase
             if (request.Email!.IsNotWhiteSpaceAndNull())
             {
                 ent.Email = request.Email;
-                ent.NormalizedEmail = request.Email!.ToUpper();
+                ent.NormalizedEmail = request.Email!.ToUpperInvariant();
             }
 
             if (request.PhoneNumber!.IsNotWhiteSpaceAndNull())

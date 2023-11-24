@@ -1,0 +1,48 @@
+﻿@page "/users"
+
+@using Microsoft.AspNetCore.Authorization
+@using TrackMap.Components;
+
+@attribute [Authorize]
+
+<PageTitle>User list</PageTitle>
+
+<h1>User list</h1>
+
+@if (Users is null)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>PhoneNumber</th>
+                <th>Created Date</th>
+                <th />
+                <th />
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var user in Users)
+            {
+                <tr>
+                    <td>@($"{user.LastName} {user.FirstName}")</td>
+                    <td>@user.Email</td>
+                    <td>@user.PhoneNumber</td>
+                    <td>@user.CreatedAt.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <a href="/user-details/@user.Id">Detail</a>
+                    </td>
+                    <td>
+                        <a href="/devices" @onclick="()=>HandleDevices(user.Devices!)">Devices</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

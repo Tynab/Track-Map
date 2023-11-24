@@ -1,0 +1,30 @@
+﻿@page "/login"
+
+@if (ShowErrors)
+{
+    <div class="alert alert-danger">
+        <p>@Error</p>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Login</h5>
+
+        <EditForm Model="Login" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label for="username">Username</label>
+                <InputText id="username" class="form-control" @bind-Value="Login.UserName" />
+            </div>
+
+            <div class="mb-3">
+                <label for="password">Password</label>
+                <InputText id="password" class="form-control" type="password" @bind-Value="Login.Password" />
+            </div>
+
+            <button type="submit" class="btn btn-success">Login</button>
+        </EditForm>
+    </div>
+</div>

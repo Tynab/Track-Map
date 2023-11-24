@@ -1,0 +1,46 @@
+﻿@page "/devices"
+
+@using TrackMap.Components;
+@using static System.Math;
+
+<PageTitle>Device list</PageTitle>
+
+<h1>Device list</h1>
+
+@if (Devices is null)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>IP Address</th>
+                <th>Device Type</th>
+                <th>Device OS</th>
+                <th>Location</th>
+                <th>Last Login</th>
+                <th>Created Date</th>
+                <th />
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var device in Devices)
+            {
+                <tr>
+                    <td>@device.IpAddress</td>
+                    <td>@device.DeviceType</td>
+                    <td>@device.DeviceOs</td>
+                    <td>@($"{Round(device.Latitude, 7)}, {Round(device.Longtitude, 7)}")</td>
+                    <td>@device.LastLogin.ToString("dd/MM/yyyy")</td>
+                    <td>@device.CreatedAt.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <a href="/device-details/@device.Id">Detail</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
