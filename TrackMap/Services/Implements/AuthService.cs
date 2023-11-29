@@ -8,18 +8,11 @@ using YANLib;
 
 namespace TrackMap.Services.Implements;
 
-public sealed class AuthService : IAuthService
+public sealed class AuthService(HttpClient httpClient, AuthenticationStateProvider authenticationStateProvider, ILocalStorageService localStorageService) : IAuthService
 {
-    private readonly HttpClient _httpClient;
-    private readonly AuthenticationStateProvider _authenticationStateProvider;
-    private readonly ILocalStorageService _localStorageService;
-
-    public AuthService(HttpClient httpClient, AuthenticationStateProvider authenticationStateProvider, ILocalStorageService localStorageService)
-    {
-        _httpClient = httpClient;
-        _authenticationStateProvider = authenticationStateProvider;
-        _localStorageService = localStorageService;
-    }
+    private readonly HttpClient _httpClient = httpClient;
+    private readonly AuthenticationStateProvider _authenticationStateProvider = authenticationStateProvider;
+    private readonly ILocalStorageService _localStorageService = localStorageService;
 
     public async ValueTask<RegisterRepsonse> Register(RegisterRequest request)
     {

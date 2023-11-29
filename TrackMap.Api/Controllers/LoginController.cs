@@ -18,18 +18,11 @@ namespace TrackMap.Api.Controllers;
 
 [Route("api/login")]
 [ApiController]
-public sealed class LoginController : ControllerBase
+public sealed class LoginController(ILogger<UserController> logger, IConfiguration configuration, SignInManager<User> signInManager) : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
-    private readonly IConfiguration _configuration;
-    private readonly SignInManager<User> _signInManager;
-
-    public LoginController(ILogger<UserController> logger, IConfiguration configuration, SignInManager<User> signInManager)
-    {
-        _logger = logger;
-        _configuration = configuration;
-        _signInManager = signInManager;
-    }
+    private readonly ILogger<UserController> _logger = logger;
+    private readonly IConfiguration _configuration = configuration;
+    private readonly SignInManager<User> _signInManager = signInManager;
 
     [HttpPost]
     [SwaggerOperation(Summary = "Login")]
@@ -54,7 +47,7 @@ public sealed class LoginController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "LoginLoginController-Exception: {Request}", request.CamelSerialize());
+            _logger.LogError(ex, "LoginLoginController-Exception: {Request}", request.Serialize());
 
             return Problem();
         }

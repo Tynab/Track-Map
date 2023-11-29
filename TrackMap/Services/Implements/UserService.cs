@@ -3,11 +3,9 @@ using TrackMap.Common.Responses;
 
 namespace TrackMap.Services.Implements;
 
-public sealed class UserService : IUserService
+public sealed class UserService(HttpClient httpClient) : IUserService
 {
-    private readonly HttpClient _httpClient;
-
-    public UserService(HttpClient httpClient) => _httpClient = httpClient;
+    private readonly HttpClient _httpClient = httpClient;
 
     public async ValueTask<List<UserResponse>?> GetAll() => await _httpClient.GetFromJsonAsync<List<UserResponse>>("api/users");
 

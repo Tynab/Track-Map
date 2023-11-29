@@ -12,16 +12,10 @@ namespace TrackMap.Api.Controllers;
 
 [Route("api/register")]
 [ApiController]
-public sealed class RegisterController : ControllerBase
+public sealed class RegisterController(ILogger<RegisterController> logger, UserManager<User> userManager) : ControllerBase
 {
-    private readonly ILogger<RegisterController> _logger;
-    private readonly UserManager<User> _userManager;
-
-    public RegisterController(ILogger<RegisterController> logger, UserManager<User> userManager)
-    {
-        _logger = logger;
-        _userManager = userManager;
-    }
+    private readonly ILogger<RegisterController> _logger = logger;
+    private readonly UserManager<User> _userManager = userManager;
 
     [HttpPost]
     public async Task<IActionResult> Register([Required] RegisterRequest request)
@@ -54,7 +48,7 @@ public sealed class RegisterController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "RegisterRegisterController-Exception: {Request}", request.CamelSerialize());
+            _logger.LogError(ex, "RegisterRegisterController-Exception: {Request}", request.Serialize());
 
             return Problem();
         }

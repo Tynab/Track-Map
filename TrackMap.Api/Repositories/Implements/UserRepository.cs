@@ -5,16 +5,10 @@ using YANLib;
 
 namespace TrackMap.Api.Repositories.Implements;
 
-public sealed class UserRepository : IUserRepository
+public sealed class UserRepository(ILogger<UserRepository> logger, TrackMapDbContext dbContext) : IUserRepository
 {
-    private readonly ILogger<UserRepository> _logger;
-    private readonly TrackMapDbContext _dbContext;
-
-    public UserRepository(ILogger<UserRepository> logger, TrackMapDbContext dbContext)
-    {
-        _logger = logger;
-        _dbContext = dbContext;
-    }
+    private readonly ILogger<UserRepository> _logger = logger;
+    private readonly TrackMapDbContext _dbContext = dbContext;
 
     public async ValueTask<IEnumerable<User>> GetAll()
     {
@@ -54,7 +48,7 @@ public sealed class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "CreateUserRepository-Exception: {Entity}", entity.CamelSerialize());
+            _logger.LogError(ex, "CreateUserRepository-Exception: {Entity}", entity.Serialize());
 
             throw;
         }
@@ -79,7 +73,7 @@ public sealed class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "UpdateUserRepository-Exception: {Entity}", entity.CamelSerialize());
+            _logger.LogError(ex, "UpdateUserRepository-Exception: {Entity}", entity.Serialize());
 
             throw;
         }

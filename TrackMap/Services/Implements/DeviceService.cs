@@ -3,11 +3,9 @@ using TrackMap.Common.Responses;
 
 namespace TrackMap.Services.Implements;
 
-public sealed class DeviceService : IDeviceService
+public sealed class DeviceService(HttpClient httpClient) : IDeviceService
 {
-    private readonly HttpClient _httpClient;
-
-    public DeviceService(HttpClient httpClient) => _httpClient = httpClient;
+    private readonly HttpClient _httpClient = httpClient;
 
     public async ValueTask<List<DeviceResponse>?> GetAll() => await _httpClient.GetFromJsonAsync<List<DeviceResponse>>("api/devices");
 

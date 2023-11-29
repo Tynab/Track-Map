@@ -8,7 +8,7 @@ public sealed class AppState
 
     public void SetDevices(List<DeviceDto> devices)
     {
-        Devices = devices ?? new List<DeviceDto>();
+        Devices = devices ?? [];
         NotifyStateChanged();
     }
 

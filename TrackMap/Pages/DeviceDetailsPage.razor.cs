@@ -10,7 +10,7 @@ public sealed partial class DeviceDetailsPage
     {
         if (Id!.IsNotWhiteSpaceAndNull())
         {
-            Device = AppState?.Devices?.FirstOrDefault(x => x.Id == new Guid(Id!));
+            Device = AppState?.Devices?.FirstOrDefault(x => x.Id == new Guid(Id));
         }
     }
 

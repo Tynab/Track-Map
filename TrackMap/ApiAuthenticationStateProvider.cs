@@ -11,16 +11,10 @@ using static System.Threading.Tasks.Task;
 
 namespace TrackMap;
 
-public sealed class ApiAuthenticationStateProvider : AuthenticationStateProvider
+public sealed class ApiAuthenticationStateProvider(HttpClient httpClient, ILocalStorageService localStorageService) : AuthenticationStateProvider
 {
-    private readonly HttpClient _httpClient;
-    private readonly ILocalStorageService _localStorageService;
-
-    public ApiAuthenticationStateProvider(HttpClient httpClient, ILocalStorageService localStorageService)
-    {
-        _httpClient = httpClient;
-        _localStorageService = localStorageService;
-    }
+    private readonly HttpClient _httpClient = httpClient;
+    private readonly ILocalStorageService _localStorageService = localStorageService;
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
@@ -43,14 +37,11 @@ public sealed class ApiAuthenticationStateProvider : AuthenticationStateProvider
 
     public void MarkUserAsLoggedOut() => NotifyAuthenticationStateChanged(FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()))));
 
-    private static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
+    private static List<Claim> ParseClaimsFromJwt(string jwt)
     {
         var rslt = new List<Claim>();
 
-        var keyValPrs = Deserialize<Dictionary<string, object>>(ParseBase64WithoutPadding(jwt.Split('.')[1]), new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-        });
+        var keyValPrs = ParseBase64WithoutPadding(jwt.Split('.')[1]).Deserialize<Dictionary<string, object>>();
 
         if (keyValPrs is not null && keyValPrs.TryGetValue(Role, out var rawRoles))
         {
@@ -58,7 +49,7 @@ public sealed class ApiAuthenticationStateProvider : AuthenticationStateProvider
             {
                 var sRoles = rawRoles.ToString();
 
-                if (sRoles!.Trim().StartsWith("["))
+                if (sRoles!.Trim().StartsWith('['))
                 {
                     var roles = sRoles.Deserialize<string[]>();
 

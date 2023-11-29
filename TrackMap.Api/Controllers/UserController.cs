@@ -14,19 +14,12 @@ namespace TrackMap.Api.Controllers;
 
 [Route("api/users")]
 [ApiController]
-public sealed class UserController : ControllerBase
+public sealed class UserController(ILogger<UserController> logger, IMapper mapper, IUserRepository repository) : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IUserRepository _repository;
-    private readonly IPasswordHasher<User> _passwordHasher = new PasswordHasher<User>();
-
-    public UserController(ILogger<UserController> logger, IMapper mapper, IUserRepository repository)
-    {
-        _logger = logger;
-        _mapper = mapper;
-        _repository = repository;
-    }
+    private readonly ILogger<UserController> _logger = logger;
+    private readonly IMapper _mapper = mapper;
+    private readonly IUserRepository _repository = repository;
+    private readonly PasswordHasher<User> _passwordHasher = new();
 
     [HttpGet]
     [SwaggerOperation(Summary = "Get all Users")]
@@ -101,7 +94,7 @@ public sealed class UserController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "CreateUserController-Exception: {Request}", request.CamelSerialize());
+            _logger.LogError(ex, "CreateUserController-Exception: {Request}", request.Serialize());
 
             return Problem();
         }
@@ -154,7 +147,7 @@ public sealed class UserController : ControllerBase
             if (request.Email!.IsNotWhiteSpaceAndNull())
             {
                 ent.Email = request.Email;
-                ent.NormalizedEmail = request.Email!.ToUpperInvariant();
+                ent.NormalizedEmail = request.Email.ToUpperInvariant();
             }
 
             if (request.PhoneNumber!.IsNotWhiteSpaceAndNull())
@@ -169,7 +162,7 @@ public sealed class UserController : ControllerBase
 
             if (request.Password!.IsNotWhiteSpaceAndNull())
             {
-                ent.PasswordHash = _passwordHasher.HashPassword(ent, request.Password!);
+                ent.PasswordHash = _passwordHasher.HashPassword(ent, request.Password);
             }
 
             ent.UpdatedBy = request.UpdatedBy;
@@ -181,7 +174,7 @@ public sealed class UserController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "UpdateUserController-Exception: {Id} - {Request}", id, request.CamelSerialize());
+            _logger.LogError(ex, "UpdateUserController-Exception: {Id} - {Request}", id, request.Serialize());
 
             return Problem();
         }

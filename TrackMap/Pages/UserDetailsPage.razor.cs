@@ -11,7 +11,7 @@ public sealed partial class UserDetailsPage
     {
         if (Id!.IsNotWhiteSpaceAndNull())
         {
-            User = await UserService!.Get(Id!);
+            User = await UserService!.Get(Id);
         }
     }
 

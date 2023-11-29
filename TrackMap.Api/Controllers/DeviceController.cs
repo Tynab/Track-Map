@@ -13,20 +13,12 @@ namespace TrackMap.Api.Controllers;
 
 [Route("api/devices")]
 [ApiController]
-public sealed class DeviceController : ControllerBase
+public sealed class DeviceController(ILogger<DeviceController> logger, IMapper mapper, IDeviceRepository repository, IUserRepository userRepository) : ControllerBase
 {
-    private readonly ILogger<DeviceController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IDeviceRepository _repository;
-    private readonly IUserRepository _userRepository;
-
-    public DeviceController(ILogger<DeviceController> logger, IMapper mapper, IDeviceRepository repository, IUserRepository userRepository)
-    {
-        _logger = logger;
-        _mapper = mapper;
-        _repository = repository;
-        _userRepository = userRepository;
-    }
+    private readonly ILogger<DeviceController> _logger = logger;
+    private readonly IMapper _mapper = mapper;
+    private readonly IDeviceRepository _repository = repository;
+    private readonly IUserRepository _userRepository = userRepository;
 
     [HttpGet]
     [SwaggerOperation(Summary = "Get all Devices")]
@@ -97,7 +89,7 @@ public sealed class DeviceController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "CreateDeviceController-Exception: {Request}", request.CamelSerialize());
+            _logger.LogError(ex, "CreateDeviceController-Exception: {Request}", request.Serialize());
 
             return Problem();
         }
@@ -182,7 +174,7 @@ public sealed class DeviceController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "UpdateDeviceController-Exception: {Id} - {Request}", id, request.CamelSerialize());
+            _logger.LogError(ex, "UpdateDeviceController-Exception: {Id} - {Request}", id, request.Serialize());
 
             return Problem();
         }

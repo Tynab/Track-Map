@@ -5,16 +5,10 @@ using YANLib;
 
 namespace TrackMap.Api.Repositories.Implements;
 
-public sealed class DeviceRepository : IDeviceRepository
+public sealed class DeviceRepository(ILogger<DeviceRepository> logger, TrackMapDbContext dbContext) : IDeviceRepository
 {
-    private readonly ILogger<DeviceRepository> _logger;
-    private readonly TrackMapDbContext _dbContext;
-
-    public DeviceRepository(ILogger<DeviceRepository> logger, TrackMapDbContext dbContext)
-    {
-        _logger = logger;
-        _dbContext = dbContext;
-    }
+    private readonly ILogger<DeviceRepository> _logger = logger;
+    private readonly TrackMapDbContext _dbContext = dbContext;
 
     public async ValueTask<IEnumerable<Device>> GetAll()
     {
@@ -63,7 +57,7 @@ public sealed class DeviceRepository : IDeviceRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "CreateDeviceRepository-Exception: {Entity}", entity.CamelSerialize());
+            _logger.LogError(ex, "CreateDeviceRepository-Exception: {Entity}", entity.Serialize());
 
             throw;
         }
@@ -88,7 +82,7 @@ public sealed class DeviceRepository : IDeviceRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "UpdateDeviceRepository-Exception: {Entity}", entity.CamelSerialize());
+            _logger.LogError(ex, "UpdateDeviceRepository-Exception: {Entity}", entity.Serialize());
 
             throw;
         }

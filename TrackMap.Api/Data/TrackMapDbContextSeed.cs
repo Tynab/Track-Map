@@ -7,7 +7,7 @@ namespace TrackMap.Api.Data;
 
 public sealed class TrackMapDbContextSeed
 {
-    private readonly IPasswordHasher<User> _passwordHasher = new PasswordHasher<User>();
+    private readonly PasswordHasher<User> _passwordHasher = new();
 
     public async Task SeedAsync(ILogger<TrackMapDbContextSeed> logger, TrackMapDbContext context)
     {
