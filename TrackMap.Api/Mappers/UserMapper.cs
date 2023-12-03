@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using TrackMap.Api.Entities;
-using TrackMap.Common.Dtos;
+using TrackMap.Common.Dtos.User;
 using TrackMap.Common.Requests.User;
 using TrackMap.Common.Responses;
 using static System.DateTime;

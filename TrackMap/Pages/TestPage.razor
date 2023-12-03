@@ -1,0 +1,27 @@
+﻿@page "/test"
+
+<PageTitle>Test</PageTitle>
+<h1>Test</h1>
+
+<div class="row text-center">
+    <label>Destination Location</label>
+
+    <div class="d-flex justify-content-center">
+        <div class="w-50">
+            <div class="row">
+                <input type="text" class="form-control text-center" id="route-destination" value="Xie Xìe Hotpot Dimsum, Đường Cộng Hòa, Phường 13, Tân Bình, Ho Chi Minh City, Vietnam" readonly />
+            </div>
+
+            <div class="row mt-3">
+                <div>
+                    <button type="button" class="btn btn-success" disabled="@IsWatching" @onclick="HandleWatch">Watch</button>
+                    <button type="button" class="btn btn-danger" @onclick="HandleReset">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div id="route" style="height:500px;width:100%;" />
+</div>

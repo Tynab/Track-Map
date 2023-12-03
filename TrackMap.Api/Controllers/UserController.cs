@@ -5,6 +5,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using TrackMap.Api.Entities;
 using TrackMap.Api.Repositories;
+using TrackMap.Common.Dtos.User;
 using TrackMap.Common.Requests.User;
 using TrackMap.Common.Responses;
 using YANLib;
@@ -27,7 +28,7 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
     {
         try
         {
-            var rslt = _mapper.Map<IEnumerable<UserResponse>>(await _repository.GetAll());
+            var rslt = _mapper.Map<IEnumerable<UserResponse>>(await _repository.GetAll()).ToList();
 
             return rslt.IsEmptyOrNull() ? NotFound() : Ok(rslt);
         }
@@ -65,8 +66,24 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
         }
     }
 
+    [HttpGet("search")]
+    [SwaggerOperation(Summary = "Search Users")]
+    public async ValueTask<IActionResult> Search([FromQuery] UserSearchDto dto)
+    {
+        try
+        {
+            return Ok(_mapper.Map<IEnumerable<UserResponse>>(dto is null ? await _repository.GetAll() : await _repository.Search(dto)));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "SearchUserController-Exception: {DTO}", dto.Serialize());
+
+            throw;
+        }
+    }
+
     [HttpPost]
-    [SwaggerOperation(Summary = "Create Users")]
+    [SwaggerOperation(Summary = "Create User")]
     public async ValueTask<IActionResult> Create([Required] UserCreateRequest request)
     {
         try
@@ -100,8 +117,64 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
         }
     }
 
+    [HttpPut("{id}")]
+    [SwaggerOperation(Summary = "Edit User")]
+    public async ValueTask<IActionResult> Edit(Guid id, UserEditRequest request)
+    {
+        try
+        {
+            var ent = await _repository.Get(id);
+
+            if (ent is null)
+            {
+                return NotFound(new
+                {
+                    title = "Not Found",
+                    status = 404,
+                    errors = new
+                    {
+                        id,
+                    }
+                });
+            }
+
+            if (await _repository.Get(request.UpdatedBy) is null)
+            {
+                return NotFound(new
+                {
+                    title = $"{nameof(request.UpdatedBy)} not found {nameof(User)}.",
+                    status = 404,
+                    errors = new
+                    {
+                        id = request.UpdatedBy
+                    }
+                });
+            }
+
+            ent.FullName = request.FullName;
+            ent.Email = request.Email;
+            ent.NormalizedEmail = request.Email.ToUpperInvariant();
+            ent.PhoneNumber = request.PhoneNumber;
+            ent.IsActive = request.IsActive;
+            ent.PasswordHash = _passwordHasher.HashPassword(ent, request.Password);
+            ent.UpdatedBy = request.UpdatedBy;
+            ent.UpdatedAt = Now;
+            ent.Devices = null;
+
+            var rslt = await _repository.Update(ent);
+
+            return rslt is null ? Problem() : Ok(_mapper.Map<UserResponse>(rslt));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "EditUserController-Exception: {Id} - {Request}", id, request.Serialize());
+
+            return Problem();
+        }
+    }
+
     [HttpPatch("{id}")]
-    [SwaggerOperation(Summary = "Update Users")]
+    [SwaggerOperation(Summary = "Update User")]
     public async ValueTask<IActionResult> Update(Guid id, UserUpdateRequest request)
     {
         try
@@ -134,23 +207,18 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
                 });
             }
 
-            if (request.FirstName!.IsNotWhiteSpaceAndNull())
+            if (request.FullName.IsNotWhiteSpaceAndNull())
             {
-                ent.FirstName = request.FirstName;
+                ent.FullName = request.FullName;
             }
 
-            if (request.LastName!.IsNotWhiteSpaceAndNull())
-            {
-                ent.LastName = request.LastName;
-            }
-
-            if (request.Email!.IsNotWhiteSpaceAndNull())
+            if (request.Email.IsNotWhiteSpaceAndNull())
             {
                 ent.Email = request.Email;
                 ent.NormalizedEmail = request.Email.ToUpperInvariant();
             }
 
-            if (request.PhoneNumber!.IsNotWhiteSpaceAndNull())
+            if (request.PhoneNumber.IsNotWhiteSpaceAndNull())
             {
                 ent.PhoneNumber = request.PhoneNumber;
             }
@@ -160,13 +228,14 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
                 ent.IsActive = request.IsActive.Value;
             }
 
-            if (request.Password!.IsNotWhiteSpaceAndNull())
+            if (request.Password.IsNotWhiteSpaceAndNull())
             {
                 ent.PasswordHash = _passwordHasher.HashPassword(ent, request.Password);
             }
 
             ent.UpdatedBy = request.UpdatedBy;
             ent.UpdatedAt = Now;
+            ent.Devices = null;
 
             var rslt = await _repository.Update(ent);
 
@@ -175,6 +244,32 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
         catch (Exception ex)
         {
             _logger.LogError(ex, "UpdateUserController-Exception: {Id} - {Request}", id, request.Serialize());
+
+            return Problem();
+        }
+    }
+
+    [HttpDelete("{id}")]
+    [SwaggerOperation(Summary = "Delete User")]
+    public async ValueTask<IActionResult> Delete(Guid id)
+    {
+        try
+        {
+            var ent = await _repository.Get(id);
+
+            return ent is null ? NotFound(new
+            {
+                title = "Not Found",
+                status = 404,
+                errors = new
+                {
+                    id,
+                }
+            }) : Ok(await _repository.Delete(ent));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "DeleteUserController-Exception: {Id}", id);
 
             return Problem();
         }

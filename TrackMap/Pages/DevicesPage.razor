@@ -1,46 +1,111 @@
 ﻿@page "/devices"
 
-@using TrackMap.Components;
-@using static System.Math;
+@using Microsoft.AspNetCore.Authorization
+@using TrackMap.Common.Enums
+@using TrackMap.Components
+@using YANLib
+@using static System.Enum;
+
+@inject IConfiguration Configuration;
+
+@attribute [Authorize]
 
 <PageTitle>Device list</PageTitle>
-
 <h1>Device list</h1>
 
-@if (Devices is null)
+@if (Users.IsEmptyOrNull() || DevicesByUser is null)
 {
     <LoadingIndicator />
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>IP Address</th>
-                <th>Device Type</th>
-                <th>Device OS</th>
-                <th>Location</th>
-                <th>Last Login</th>
-                <th>Created Date</th>
-                <th />
-            </tr>
-        </thead>
+    <div class="row">
+        <EditForm Model="DeviceSearch" OnSubmit="HandleDeviceSearch">
+            <div class="row">
+                <div class="col">
+                    <label>Device Type</label>
 
-        <tbody>
-            @foreach (var device in Devices)
-            {
+                    <InputSelect class="form-control" @bind-Value="DeviceSearch.DeviceType">
+                        <option>Select a priority</option>
+
+                        @foreach (var item in GetNames(typeof(DeviceType)))
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="col">
+                    <label>Device OS</label>
+
+                    <InputSelect class="form-control" @bind-Value="DeviceSearch.DeviceOs">
+                        <option>Select a priority</option>
+
+                        @foreach (var item in GetNames(typeof(DeviceOs)))
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="col">
+                    <label>User</label>
+
+                    <InputSelect class="form-control" @bind-Value="DeviceSearch.UserId">
+                        <option>Select an asignee</option>
+
+                        @foreach (var user in Users)
+                        {
+                            <option value="@user.Id">@user.FullName</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="col pt-4">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+
+    <div class="row mt-4">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@device.IpAddress</td>
-                    <td>@device.DeviceType</td>
-                    <td>@device.DeviceOs</td>
-                    <td>@($"{Round(device.Latitude, 7)}, {Round(device.Longtitude, 7)}")</td>
-                    <td>@device.LastLogin.ToString("dd/MM/yyyy")</td>
-                    <td>@device.CreatedAt.ToString("dd/MM/yyyy")</td>
-                    <td>
-                        <a href="/device-details/@device.Id">Detail</a>
-                    </td>
+                    <th>IP Address</th>
+                    <th>Device Type</th>
+                    <th>Device OS</th>
+                    <th>Location</th>
+                    <th>Last Login</th>
+                    <th>Created Date</th>
+                    <th />
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+
+            <tbody>
+                @foreach (var device in DevicesByUser)
+                {
+                    <tr>
+                        <td>@device.IpAddress</td>
+
+                        <td>
+                            <DeviceTypeLabel DeviceType="device.DeviceType" />
+                        </td>
+
+                        <td>
+                            <DeviceOsLabel DeviceOs="device.DeviceOs" />
+                        </td>
+
+                        <td>@($"{device.Latitude.Round(7)}, {device.Longitude.Round(7)}")</td>
+                        <td>@device.LastLogin.ToString(Configuration["DateFormat"])</td>
+                        <td>@device.CreatedAt.ToString(Configuration["DateFormat"])</td>
+
+                        <td>
+                            <a href="/device-detail/@device.Id">Detail</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }

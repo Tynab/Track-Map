@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
-using TrackMap.Common.Dtos;
+﻿using Blazored.Toast.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using TrackMap.Common.Dtos.Device;
+using TrackMap.Common.Dtos.User;
 using TrackMap.Common.Responses;
 using TrackMap.Services;
 
@@ -13,9 +16,18 @@ public sealed partial class UsersPage
         AppState!.OnStateChange += StateHasChanged;
     }
 
-    private void HandleDevices(List<DeviceDto> devices) => AppState?.SetDevices(devices);
+    private async Task HandleUserSearch(EditContext context)
+    {
+        ToastService!.ShowInfo("Seach completed");
+        Users = await UserService!.Search(UserSearch);
+    }
+
+    private void HandleDevices(List<DeviceDto> devices) => AppState?.SetDevicesByUser(devices);
 
     public void Dispose() => AppState!.OnStateChange -= StateHasChanged;
+
+    [Inject]
+    private IToastService? ToastService { get; set; }
 
     [Inject]
     private IUserService? UserService { get; set; }
@@ -24,4 +36,6 @@ public sealed partial class UsersPage
     private AppState? AppState { get; set; }
 
     private List<UserResponse>? Users { get; set; }
+
+    private UserSearchDto UserSearch { get; set; } = new UserSearchDto();
 }

@@ -1,4 +1,5 @@
-﻿using TrackMap.Common.Dtos;
+﻿using TrackMap.Common.Dtos.User;
+using TrackMap.Common.Enums;
 
 namespace TrackMap.Common.Responses;
 
@@ -6,15 +7,15 @@ public sealed record DeviceResponse
 {
     public Guid Id { get; set; }
 
-    public string? DeviceType { get; set; }
+    public DeviceType DeviceType { get; set; }
 
-    public string? DeviceOs { get; set; }
+    public DeviceOs DeviceOs { get; set; }
 
     public string? IpAddress { get; set; }
 
     public decimal Latitude { get; set; }
 
-    public decimal Longtitude { get; set; }
+    public decimal Longitude { get; set; }
 
     public DateTime LastLogin { get; set; }
 

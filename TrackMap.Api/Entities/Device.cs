@@ -18,7 +18,7 @@ public sealed class Device
     public decimal Latitude { get; set; }
 
     [Column(TypeName = "decimal(19,15)")]
-    public decimal Longtitude { get; set; }
+    public decimal Longitude { get; set; }
 
     public DateTime LastLogin { get; set; }
 

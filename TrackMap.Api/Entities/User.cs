@@ -4,9 +4,7 @@ namespace TrackMap.Api.Entities;
 
 public sealed class User : IdentityUser<Guid>
 {
-    public string? FirstName { get; set; }
-
-    public string? LastName { get; set; }
+    public string? FullName { get; set; }
 
     public Guid CreatedBy { get; set; }
 

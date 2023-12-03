@@ -10,12 +10,10 @@ public sealed class UserUpdateRequest
 
     public string? PhoneNumber { get; set; }
 
-    public string? FirstName { get; set; }
-
-    public string? LastName { get; set; }
+    public string? FullName { get; set; }
 
     public required Guid UpdatedBy { get; set; }
 
     [DefaultValue(true)]
-    public bool? IsActive { get; set; }
+    public bool? IsActive { get; set; } = true;
 }

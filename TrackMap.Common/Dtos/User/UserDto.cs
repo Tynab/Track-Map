@@ -1,12 +1,10 @@
-﻿namespace TrackMap.Common.Dtos;
+﻿namespace TrackMap.Common.Dtos.User;
 
 public sealed record UserDto
 {
     public Guid Id { get; set; }
 
-    public string? FirstName { get; set; }
-
-    public string? LastName { get; set; }
+    public string? FullName { get; set; }
 
     public string? UserName { get; set; }
 

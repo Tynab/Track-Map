@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TrackMap.Api.Data;
 using TrackMap.Api.Entities;
+using TrackMap.Common.Dtos.Device;
 using YANLib;
 
 namespace TrackMap.Api.Repositories.Implements;
@@ -14,7 +15,7 @@ public sealed class DeviceRepository(ILogger<DeviceRepository> logger, TrackMapD
     {
         try
         {
-            return await _dbContext.Devices.Where(x => x.IsActive == true).Include(x => x.User).AsNoTracking().ToArrayAsync();
+            return await _dbContext.Devices.Where(x => x.IsActive == true).OrderByDescending(x => x.LastLogin).Include(x => x.User).AsNoTracking().ToArrayAsync();
         }
         catch (Exception ex)
         {
@@ -33,6 +34,37 @@ public sealed class DeviceRepository(ILogger<DeviceRepository> logger, TrackMapD
         catch (Exception ex)
         {
             _logger.LogError(ex, "GetDeviceRepository-Exception: {Id}", id);
+
+            throw;
+        }
+    }
+
+    public async ValueTask<IEnumerable<Device>> Search(DeviceSearchDto dto)
+    {
+        try
+        {
+            var qry = _dbContext.Devices.AsQueryable();
+
+            if (dto.DeviceType.HasValue)
+            {
+                qry = qry.Where(x => x.DeviceType == dto.DeviceType.Value.ToString());
+            }
+
+            if (dto.DeviceOs.HasValue)
+            {
+                qry = qry.Where(x => x.DeviceType == dto.DeviceOs.Value.ToString());
+            }
+
+            if (dto.UserId.HasValue)
+            {
+                qry = qry.Where(x => x.UserId == dto.UserId.Value);
+            }
+
+            return await qry.OrderByDescending(x => x.LastLogin).Include(x => x.User).AsNoTracking().ToArrayAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "SearchDeviceRepository-Exception: {DTO}", dto.Serialize());
 
             throw;
         }
@@ -83,6 +115,22 @@ public sealed class DeviceRepository(ILogger<DeviceRepository> logger, TrackMapD
         catch (Exception ex)
         {
             _logger.LogError(ex, "UpdateDeviceRepository-Exception: {Entity}", entity.Serialize());
+
+            throw;
+        }
+    }
+
+    public async ValueTask<Device?> Delete(Device entity)
+    {
+        try
+        {
+            var ent = _dbContext.Devices.Remove(entity);
+
+            return await _dbContext.SaveChangesAsync() > 0 ? ent.Entity : default;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "DeleteDeviceRepository-Exception: {Entity}", entity.Serialize());
 
             throw;
         }

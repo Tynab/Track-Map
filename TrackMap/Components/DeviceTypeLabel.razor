@@ -1,0 +1,25 @@
+﻿@using TrackMap.Common.Enums
+
+@switch (DeviceType)
+{
+    case DeviceType.PC:
+        {
+            <span class="badge bg-primary">@nameof(DeviceType.PC)</span>
+            break;
+        }
+    case DeviceType.Smartphone:
+        {
+            <span class="badge bg-success">@nameof(DeviceType.Smartphone)</span>
+            break;
+        }
+    case DeviceType.Other:
+        {
+            <span class="badge bg-secondary">@nameof(DeviceType.Other)</span>
+            break;
+        }
+}
+
+@code {
+    [Parameter]
+    public DeviceType DeviceType { get; set; }
+}

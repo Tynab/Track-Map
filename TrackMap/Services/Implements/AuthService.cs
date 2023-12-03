@@ -14,11 +14,11 @@ public sealed class AuthService(HttpClient httpClient, AuthenticationStateProvid
     private readonly AuthenticationStateProvider _authenticationStateProvider = authenticationStateProvider;
     private readonly ILocalStorageService _localStorageService = localStorageService;
 
-    public async ValueTask<RegisterRepsonse> Register(RegisterRequest request)
+    public async ValueTask<RegisterRepsonse?> Register(RegisterRequest request)
     {
-        //var result = await _httpClient.PostAsJsonAsync<RegisterRepsonse>("api/users", registerModel);
+        var res = await _httpClient.PostAsJsonAsync("api/register", request);
 
-        return default;
+        return (await res.Content.ReadAsStringAsync()).Deserialize<RegisterRepsonse>();
     }
 
     public async ValueTask<LoginResponse?> Login(LoginRequest request)

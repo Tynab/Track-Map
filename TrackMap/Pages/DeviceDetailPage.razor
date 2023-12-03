@@ -1,0 +1,63 @@
+﻿@page "/device-detail/{id}"
+
+@using Microsoft.AspNetCore.Authorization
+@using TrackMap.Components
+
+@inject IConfiguration Configuration;
+
+@attribute [Authorize]
+
+<PageTitle>Device detail</PageTitle>
+<h1>Device detail</h1>
+
+@if (Device is null)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <h3>@Device.IpAddress</h3>
+
+    <table class="table">
+        <tr>
+            <td>Device Type</td>
+
+            <td>
+                <DeviceTypeLabel DeviceType="Device.DeviceType" />
+            </td>
+        </tr>
+
+        <tr>
+            <td>Device OS</td>
+
+            <td>
+                <DeviceOsLabel DeviceOs="Device.DeviceOs" />
+            </td>
+        </tr>
+
+        <tr>
+            <td>Latitude</td>
+            <td>@Device.Latitude</td>
+        </tr>
+
+        <tr>
+            <td>Longitude</td>
+            <td>@Device.Longitude</td>
+        </tr>
+
+        <tr>
+            <td>LastLogin</td>
+            <td>@Device.LastLogin.ToString(Configuration["DateTimeFormat"])</td>
+        </tr>
+
+        <tr>
+            <td>Created At</td>
+            <td>@Device.CreatedAt.ToString(Configuration["DateTimeFormat"])</td>
+        </tr>
+
+        <tr>
+            <td>Updated At</td>
+            <td>@(Device.UpdatedAt.HasValue ? Device.UpdatedAt.Value.ToString(Configuration["DateTimeFormat"]) : "N/A")</td>
+        </tr>
+    </table>
+}

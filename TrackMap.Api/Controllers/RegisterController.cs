@@ -22,6 +22,15 @@ public sealed class RegisterController(ILogger<RegisterController> logger, UserM
     {
         try
         {
+            if (request.Password != request.ConfirmPassword)
+            {
+                return BadRequest(new RegisterRepsonse
+                {
+                    Success = false,
+                    Errors = ["Password and Confirm Password do not match"]
+                });
+            }
+
             var id = NewGuid();
 
             var result = await _userManager.CreateAsync(new User
@@ -32,8 +41,8 @@ public sealed class RegisterController(ILogger<RegisterController> logger, UserM
                 IsActive = true,
                 SecurityStamp = NewGuid().ToString(),
                 UserName = request.UserName,
-                NormalizedUserName = request.UserName.ToUpperInvariant()
-            }, request.Password);
+                NormalizedUserName = request.UserName!.ToUpperInvariant()
+            }, request.Password!);
 
             return Ok(result.Succeeded
                 ? new RegisterRepsonse

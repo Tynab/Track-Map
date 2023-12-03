@@ -1,0 +1,50 @@
+﻿@using TrackMap.Common.Enums
+
+@switch (DeviceOs)
+{
+    case DeviceOs.Windows:
+        {
+            <span class="badge bg-info">@nameof(DeviceOs.Windows)</span>
+            break;
+        }
+    case DeviceOs.macOS:
+        {
+            <span class="badge bg-light">@nameof(DeviceOs.macOS)</span>
+            break;
+        }
+    case DeviceOs.Linux:
+        {
+            <span class="badge bg-dark">@nameof(DeviceOs.Linux)</span>
+            break;
+        }
+    case DeviceOs.Ubuntu:
+        {
+            <span class="badge bg-danger">@nameof(DeviceOs.Ubuntu)</span>
+            break;
+        }
+    case DeviceOs.ChromeOS:
+        {
+            <span class="badge bg-warning">@nameof(DeviceOs.ChromeOS)</span>
+            break;
+        }
+    case DeviceOs.iOS:
+        {
+            <span class="badge bg-primary">@nameof(DeviceOs.iOS)</span>
+            break;
+        }
+    case DeviceOs.Android:
+        {
+            <span class="badge bg-success">@nameof(DeviceOs.Android)</span>
+            break;
+        }
+    case DeviceOs.Other:
+        {
+            <span class="badge bg-secondary">@nameof(DeviceOs.Other)</span>
+            break;
+        }
+}
+
+@code {
+    [Parameter]
+    public DeviceOs DeviceOs { get; set; }
+}

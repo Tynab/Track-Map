@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazored.Toast.Services;
+using Microsoft.AspNetCore.Components;
 using TrackMap.Common.Requests;
 using TrackMap.Services;
 
@@ -21,7 +22,8 @@ public sealed partial class LoginPage
         {
             if (rslt.Success)
             {
-                NavigationManager?.NavigateTo("/users");
+                ToastService!.ShowSuccess("Login successful");
+                NavigationManager?.NavigateTo("/");
             }
             else
             {
@@ -35,11 +37,14 @@ public sealed partial class LoginPage
     private NavigationManager? NavigationManager { get; set; }
 
     [Inject]
+    private IToastService? ToastService { get; set; }
+
+    [Inject]
     private IAuthService? AuthService { get; set; }
+
+    private LoginRequest Login { get; set; } = new LoginRequest();
 
     private bool ShowErrors { get; set; }
 
     private string Error { get; set; } = string.Empty;
-
-    private LoginRequest Login { get; set; } = new LoginRequest();
 }

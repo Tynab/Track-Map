@@ -1,12 +1,13 @@
 ﻿@page "/users"
 
 @using Microsoft.AspNetCore.Authorization
-@using TrackMap.Components;
+@using TrackMap.Components
+
+@inject IConfiguration Configuration;
 
 @attribute [Authorize]
 
 <PageTitle>User list</PageTitle>
-
 <h1>User list</h1>
 
 @if (Users is null)
@@ -15,34 +16,62 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>PhoneNumber</th>
-                <th>Created Date</th>
-                <th />
-                <th />
-            </tr>
-        </thead>
+    <div class="row">
+        <EditForm Model="UserSearch" OnSubmit="HandleUserSearch">
+            <div class="row">
+                <div class="col">
+                    <label>Full Name</label>
+                    <InputText class="form-control" @bind-Value="UserSearch.FullName" />
+                </div>
 
-        <tbody>
-            @foreach (var user in Users)
-            {
+                <div class="col">
+                    <label>Email</label>
+                    <InputText class="form-control" @bind-Value="UserSearch.Email" />
+                </div>
+
+                <div class="col">
+                    <label>Phone Number</label>
+                    <InputText class="form-control" @bind-Value="UserSearch.PhoneNumber" />
+                </div>
+
+                <div class="col pt-4">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+
+    <div class="row mt-4">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@($"{user.LastName} {user.FirstName}")</td>
-                    <td>@user.Email</td>
-                    <td>@user.PhoneNumber</td>
-                    <td>@user.CreatedAt.ToString("dd/MM/yyyy")</td>
-                    <td>
-                        <a href="/user-details/@user.Id">Detail</a>
-                    </td>
-                    <td>
-                        <a href="/devices" @onclick="()=>HandleDevices(user.Devices!)">Devices</a>
-                    </td>
+                    <th>User Name</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>PhoneNumber</th>
+                    <th>Created Date</th>
+                    <th />
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+
+            <tbody>
+                @foreach (var user in Users)
+                {
+                    <tr>
+                        <td>@user.UserName</td>
+                        <td>@(user.FullName ?? "N/A")</td>
+                        <td>@(user.Email ?? "N/A")</td>
+                        <td>@(user.PhoneNumber ?? "N/A")</td>
+                        <td>@user.CreatedAt.ToString(Configuration["DateFormat"])</td>
+
+                        <td>
+                            <a href="/user-detail/@user.Id">Detail</a>
+                            <a> | </a>
+                            <a href="/devices" @onclick="()=>HandleDevices(user.Devices!)">Devices</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }

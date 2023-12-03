@@ -1,4 +1,4 @@
-﻿using TrackMap.Common.Dtos;
+﻿using TrackMap.Common.Dtos.Device;
 
 namespace TrackMap;
 
@@ -6,13 +6,13 @@ public sealed class AppState
 {
     public event Action? OnStateChange;
 
-    public void SetDevices(List<DeviceDto> devices)
+    public void SetDevicesByUser(List<DeviceDto> devices)
     {
-        Devices = devices ?? [];
+        DevicesByUser = devices ?? [];
         NotifyStateChanged();
     }
 
     private void NotifyStateChanged() => OnStateChange?.Invoke();
 
-    public List<DeviceDto>? Devices { get; set; }
+    public List<DeviceDto>? DevicesByUser { get; set; }
 }

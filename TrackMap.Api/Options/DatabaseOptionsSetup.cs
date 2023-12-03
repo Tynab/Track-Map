@@ -6,5 +6,5 @@ public sealed class DatabaseOptionsSetup(IConfiguration configuration) : IConfig
 {
     private readonly IConfiguration _configuration = configuration;
 
-    public void Configure(DatabaseOptions options) => options.ConnectionString = _configuration.GetConnectionString("Default")!;
+    public void Configure(DatabaseOptions options) => options.ConnectionString = _configuration.GetConnectionString("Default") ?? string.Empty;
 }

@@ -5,13 +5,13 @@ using YANLib;
 
 namespace TrackMap.Pages;
 
-public sealed partial class UserDetailsPage
+public sealed partial class UserDetailPage
 {
     protected override async Task OnInitializedAsync()
     {
-        if (Id!.IsNotWhiteSpaceAndNull())
+        if (Id.IsNotWhiteSpaceAndNull())
         {
-            User = await UserService!.Get(Id);
+            User = await UserService!.Get(new Guid(Id));
         }
     }
 

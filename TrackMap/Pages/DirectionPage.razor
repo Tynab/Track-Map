@@ -1,0 +1,37 @@
+﻿@page "/direction"
+
+<PageTitle>Google Map direction</PageTitle>
+<h1>Google Map direction</h1>
+
+<div class="row  text-center">
+    <EditForm Model="Direction" OnValidSubmit="HandleDirection">
+        <DataAnnotationsValidator />
+
+        <div class="d-flex justify-content-center">
+            <div class="w-100">
+                <div class="row">
+                    <div class="col">
+                        <label>Source Location</label>
+                        <InputText class="form-control text-center" id="direction-source" @bind-Value="Direction!.SourceLocation" />
+                    </div>
+
+                    <div class="col">
+                        <label>Destination Location</label>
+                        <InputText class="form-control text-center" id="direction-destination" @bind-Value="Direction!.DestinationLocation" />
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div>
+                        <button type="submit" class="btn btn-primary">Calculate</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </EditForm>
+</div>
+
+<div class="row mt-4">
+    <div id="direction" style="height:500px;width:100%;" />
+</div>

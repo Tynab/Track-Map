@@ -4,6 +4,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using TrackMap.Api.Entities;
 using TrackMap.Api.Repositories;
+using TrackMap.Common.Dtos.Device;
 using TrackMap.Common.Requests.Device;
 using TrackMap.Common.Responses;
 using YANLib;
@@ -26,7 +27,7 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
     {
         try
         {
-            var rslt = _mapper.Map<IEnumerable<DeviceResponse>>(await _repository.GetAll());
+            var rslt = _mapper.Map<IEnumerable<DeviceResponse>>(await _repository.GetAll()).ToList();
 
             return rslt.IsEmptyOrNull() ? NotFound() : Ok(rslt);
         }
@@ -64,6 +65,22 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
         }
     }
 
+    [HttpGet("search")]
+    [SwaggerOperation(Summary = "Search Devices")]
+    public async ValueTask<IActionResult> Search([FromQuery] DeviceSearchDto dto)
+    {
+        try
+        {
+            return Ok(_mapper.Map<IEnumerable<DeviceResponse>>(dto is null ? await _repository.GetAll() : await _repository.Search(dto)));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "SearchDeviceController-Exception: {DTO}", dto.Serialize());
+
+            throw;
+        }
+    }
+
     [HttpPost]
     [SwaggerOperation(Summary = "Create Device")]
     public async ValueTask<IActionResult> Create([Required] DeviceCreateRequest request)
@@ -90,6 +107,64 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
         catch (Exception ex)
         {
             _logger.LogError(ex, "CreateDeviceController-Exception: {Request}", request.Serialize());
+
+            return Problem();
+        }
+    }
+
+    [HttpPut("{id}")]
+    [SwaggerOperation(Summary = "Edit Device")]
+    public async ValueTask<IActionResult> Edit(Guid id, DeviceEditRequest request)
+    {
+        try
+        {
+            var ent = await _repository.Get(id);
+
+            if (ent is null)
+            {
+                return NotFound(new
+                {
+                    title = "Not Found",
+                    status = 404,
+                    errors = new
+                    {
+                        id,
+                    }
+                });
+            }
+
+            if (await _userRepository.Get(request.UpdatedBy) is null)
+            {
+                return NotFound(new
+                {
+                    title = $"{nameof(request.UpdatedBy)} not found {nameof(User)}.",
+                    status = 404,
+                    errors = new
+                    {
+                        request.UpdatedBy
+                    }
+                });
+            }
+
+            ent.DeviceType = request.DeviceType.ToString();
+            ent.DeviceOs = request.DeviceOs.ToString();
+            ent.IpAddress = request.IpAddress;
+            ent.Latitude = request.Latitude;
+            ent.Longitude = request.Longitude;
+            ent.UserId = request.UserId;
+            ent.IsActive = request.IsActive;
+            ent.LastLogin = Now;
+            ent.UpdatedBy = request.UpdatedBy;
+            ent.UpdatedAt = Now;
+            ent.User = null;
+
+            var rslt = await _repository.Update(ent);
+
+            return rslt is null ? Problem() : Ok(_mapper.Map<DeviceResponse>(rslt));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "EditDeviceController-Exception: {Id} - {Request}", id, request.Serialize());
 
             return Problem();
         }
@@ -129,17 +204,17 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
                 });
             }
 
-            if (request.DeviceType!.IsNotWhiteSpaceAndNull())
+            if (request.DeviceType.HasValue)
             {
-                ent.DeviceType = request.DeviceType;
+                ent.DeviceType = request.DeviceType.Value.ToString();
             }
 
-            if (request.DeviceOs!.IsNotWhiteSpaceAndNull())
+            if (request.DeviceOs.HasValue)
             {
-                ent.DeviceOs = request.DeviceOs;
+                ent.DeviceOs = request.DeviceOs.Value.ToString();
             }
 
-            if (request.IpAddress!.IsNotWhiteSpaceAndNull())
+            if (request.IpAddress.IsNotWhiteSpaceAndNull())
             {
                 ent.IpAddress = request.IpAddress;
             }
@@ -149,9 +224,9 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
                 ent.Latitude = request.Latitude.Value;
             }
 
-            if (request.Longtitude.HasValue)
+            if (request.Longitude.HasValue)
             {
-                ent.Longtitude = request.Longtitude.Value;
+                ent.Longitude = request.Longitude.Value;
             }
 
             if (request.UserId.HasValue)
@@ -167,6 +242,7 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
             ent.LastLogin = Now;
             ent.UpdatedBy = request.UpdatedBy;
             ent.UpdatedAt = Now;
+            ent.User = null;
 
             var rslt = await _repository.Update(ent);
 
@@ -175,6 +251,32 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
         catch (Exception ex)
         {
             _logger.LogError(ex, "UpdateDeviceController-Exception: {Id} - {Request}", id, request.Serialize());
+
+            return Problem();
+        }
+    }
+
+    [HttpDelete("{id}")]
+    [SwaggerOperation(Summary = "Delete Device")]
+    public async ValueTask<IActionResult> Delete(Guid id)
+    {
+        try
+        {
+            var ent = await _repository.Get(id);
+
+            return ent is null ? NotFound(new
+            {
+                title = "Not Found",
+                status = 404,
+                errors = new
+                {
+                    id,
+                }
+            }) : Ok(await _repository.Delete(ent));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "DeleteDeviceController-Exception: {Id}", id);
 
             return Problem();
         }

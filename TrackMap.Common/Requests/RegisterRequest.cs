@@ -1,10 +1,15 @@
-﻿namespace TrackMap.Common.Requests;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TrackMap.Common.Requests;
 
 public sealed class RegisterRequest
 {
-    public required string UserName { get; set; }
+    [Required]
+    public string? UserName { get; set; }
 
-    public required string Password { get; set; }
+    [Required]
+    public string? Password { get; set; }
 
-    public required string ConfirmPassword { get; set; }
+    [Required]
+    public string? ConfirmPassword { get; set; }
 }

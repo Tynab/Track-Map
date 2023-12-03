@@ -1,0 +1,30 @@
+﻿@page "/route"
+
+<PageTitle>Google Map route</PageTitle>
+<h1>Google Map route</h1>
+
+<div class="row text-center">
+    <EditForm Model="Route" OnValidSubmit="HandleRoute">
+        <DataAnnotationsValidator />
+        <label>Destination Location</label>
+
+        <div class="d-flex justify-content-center">
+            <div class="w-50">
+                <div class="row">
+                    <InputText class="form-control text-center" id="route-destination" @bind-Value="Route!.DestinationLocation" />
+                </div>
+
+                <div class="row mt-3">
+                    <div>
+                        <button type="submit" class="btn btn-success">Start</button>
+                        <button type="button" class="btn btn-danger" @onclick="HandleReset">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+<div class="row mt-4">
+    <div id="route" style="height:500px;width:100%;" />
+</div>

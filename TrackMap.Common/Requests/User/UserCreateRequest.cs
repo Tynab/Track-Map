@@ -10,9 +10,7 @@ public sealed class UserCreateRequest
 
     public required string PhoneNumber { get; set; }
 
-    public required string FirstName { get; set; }
-
-    public required string LastName { get; set; }
+    public required string FullName { get; set; }
 
     public required Guid CreatedBy { get; set; }
 }

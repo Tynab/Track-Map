@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Components;
-using TrackMap.Common.Dtos;
+using TrackMap.Common.Dtos.Device;
 using YANLib;
 
 namespace TrackMap.Pages;
 
-public sealed partial class DeviceDetailsPage
+public sealed partial class DeviceDetailPage
 {
     protected override void OnInitialized()
     {
-        if (Id!.IsNotWhiteSpaceAndNull())
+        if (Id.IsNotWhiteSpaceAndNull())
         {
-            Device = AppState?.Devices?.FirstOrDefault(x => x.Id == new Guid(Id));
+            Device = AppState?.DevicesByUser?.FirstOrDefault(x => x.Id == new Guid(Id));
         }
     }
 

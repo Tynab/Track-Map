@@ -5,7 +5,7 @@ namespace TrackMap.Services;
 
 public interface IAuthService
 {
-    public ValueTask<RegisterRepsonse> Register(RegisterRequest request);
+    public ValueTask<RegisterRepsonse?> Register(RegisterRequest request);
 
     public ValueTask<LoginResponse?> Login(LoginRequest request);
 

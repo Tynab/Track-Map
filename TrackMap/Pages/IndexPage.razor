@@ -1,9 +1,11 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+@using Microsoft.AspNetCore.Authorization
 
-<h1>Hello, world!</h1>
+@attribute [Authorize]
 
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+<PageTitle>Home</PageTitle>
+<h1>Home</h1>
+<div id="map" style="height:500px;width:100%;" />
+<div id="request"></div>
+<div id="response"></div>

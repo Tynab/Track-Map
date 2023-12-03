@@ -1,0 +1,47 @@
+﻿@page "/user-detail/{id}"
+
+@using Microsoft.AspNetCore.Authorization
+@using TrackMap.Components
+
+@inject IConfiguration Configuration;
+
+@attribute [Authorize]
+
+<PageTitle>User detail</PageTitle>
+<h1>User detail</h1>
+
+@if (User is null)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <h3>@User.UserName</h3>
+
+    <table class="table">
+        <tr>
+            <td>Full Name</td>
+            <td>@(User.FullName ?? "N/A")</td>
+        </tr>
+
+        <tr>
+            <td>Email</td>
+            <td>@(User.Email ?? "N/A")</td>
+        </tr>
+
+        <tr>
+            <td>Phone Number</td>
+            <td>@(User.PhoneNumber ?? "N/A")</td>
+        </tr>
+
+        <tr>
+            <td>Created At</td>
+            <td>@User.CreatedAt.ToString(Configuration["DateTimeFormat"])</td>
+        </tr>
+
+        <tr>
+            <td>Updated At</td>
+            <td>@(User.UpdatedAt.HasValue ? User.UpdatedAt.Value.ToString(Configuration["DateTimeFormat"]) : "N/A")</td>
+        </tr>
+    </table>
+}

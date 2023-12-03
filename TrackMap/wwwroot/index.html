@@ -10,6 +10,7 @@
     <link href="css/app.css" rel="stylesheet" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="TrackMap.styles.css" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 </head>
 
 <body>
@@ -18,6 +19,7 @@
             <circle r="40%" cx="50%" cy="50%" />
             <circle r="40%" cx="50%" cy="50%" />
         </svg>
+
         <div class="loading-progress-text"></div>
     </div>
 
@@ -27,6 +29,436 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_content/BrowserInterop/scripts.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbSfMXQK82IEyOs2j3mUgZepqVquTyzxo&libraries=places"></script>
+    <!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCrogK-fU6biDJkzfwuLMzYorxbI_MVhAM&libraries=places"></script>-->
+
+    <script>
+        const timeMilestone = 17
+
+        const nightMapType = new google.maps.StyledMapType(
+            [
+                {
+                    elementType: "geometry",
+                    stylers: [{ color: "#242f3e" }]
+                },
+                {
+                    elementType: "labels.text.stroke",
+                    stylers: [{ color: "#242f3e" }]
+                },
+                {
+                    elementType: "labels.text.fill",
+                    stylers: [{ color: "#746855" }]
+                },
+                {
+                    featureType: "administrative.locality",
+                    elementType: "labels.text.fill",
+                    stylers: [{ color: "#d59563" }],
+                },
+                {
+                    featureType: "poi",
+                    elementType: "labels.text.fill",
+                    stylers: [{ color: "#d59563" }],
+                },
+                {
+                    featureType: "poi.park",
+                    elementType: "geometry",
+                    stylers: [{ color: "#263c3f" }],
+                },
+                {
+                    featureType: "poi.park",
+                    elementType: "labels.text.fill",
+                    stylers: [{ color: "#6b9a76" }],
+                },
+                {
+                    featureType: "road",
+                    elementType: "geometry",
+                    stylers: [{ color: "#38414e" }],
+                },
+                {
+                    featureType: "road",
+                    elementType: "geometry.stroke",
+                    stylers: [{ color: "#212a37" }],
+                },
+                {
+                    featureType: "road",
+                    elementType: "labels.text.fill",
+                    stylers: [{ color: "#9ca5b3" }],
+                },
+                {
+                    featureType: "road.highway",
+                    elementType: "geometry",
+                    stylers: [{ color: "#746855" }],
+                },
+                {
+                    featureType: "road.highway",
+                    elementType: "geometry.stroke",
+                    stylers: [{ color: "#1f2835" }],
+                },
+                {
+                    featureType: "road.highway",
+                    elementType: "labels.text.fill",
+                    stylers: [{ color: "#f3d19c" }],
+                },
+                {
+                    featureType: "transit",
+                    elementType: "geometry",
+                    stylers: [{ color: "#2f3948" }],
+                },
+                {
+                    featureType: "transit.station",
+                    elementType: "labels.text.fill",
+                    stylers: [{ color: "#d59563" }],
+                },
+                {
+                    featureType: "water",
+                    elementType: "geometry",
+                    stylers: [{ color: "#17263c" }],
+                },
+                {
+                    featureType: "water",
+                    elementType: "labels.text.fill",
+                    stylers: [{ color: "#515c6d" }],
+                },
+                {
+                    featureType: "water",
+                    elementType: "labels.text.stroke",
+                    stylers: [{ color: "#17263c" }],
+                },
+            ],
+            { name: "Night" }
+        )
+
+        let marker
+
+        function initMap(lat, lon) {
+            var latlng = new google.maps.LatLng(lat, lon);
+
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: latlng,
+                zoom: 20,
+                mapTypeControlOptions: {
+                    mapTypeIds: ["roadmap", "satellite", "hybrid", "terrain", "night_map"],
+                },
+                zoomControl: true,
+                mapTypeControl: true,
+                scaleControl: true,
+                streetViewControl: true,
+                rotateControl: true,
+                fullscreenControl: true
+            })
+
+            map.mapTypes.set("night_map", nightMapType)
+
+            if (new Date().getHours() > timeMilestone) {
+                map.setMapTypeId("night_map");
+            }
+
+            marker = new google.maps.Marker({
+                map,
+                draggable: true,
+                animation: google.maps.Animation.DROP,
+                position: latlng,
+            })
+
+            marker.addListener("click", toggleBounce)
+        }
+
+        function toggleBounce() {
+            if (marker.getAnimation() !== null) {
+                marker.setAnimation(null)
+            } else {
+                marker.setAnimation(google.maps.Animation.BOUNCE)
+            }
+        }
+
+        let directionService, directionRenderer
+        let directionSource, directionDestination
+
+        function initDirection(lat, lon) {
+            var latlng = new google.maps.LatLng(lat, lon)
+
+            const map = new google.maps.Map(document.getElementById("direction"), {
+                center: latlng,
+                zoom: 20,
+                mapTypeControlOptions: {
+                    mapTypeIds: ["roadmap", "satellite", "hybrid", "terrain", "night_map"],
+                },
+                mapId: "90f87356969d889c",
+                zoomControl: true,
+                mapTypeControl: true,
+                scaleControl: true,
+                streetViewControl: true,
+                rotateControl: true,
+                fullscreenControl: true
+            })
+
+            map.mapTypes.set("night_map", nightMapType)
+
+            if (new Date().getHours() > timeMilestone) {
+                map.setMapTypeId("night_map");
+            }
+
+            directionService = new google.maps.DirectionsService()
+            directionRenderer = new google.maps.DirectionsRenderer()
+            directionRenderer.setMap(map)
+
+            directionSource = new google.maps.places.Autocomplete(
+                document.getElementById("direction-source")
+            )
+
+            directionDestination = new google.maps.places.Autocomplete(
+                document.getElementById("direction-destination")
+            )
+
+            const buttons = [
+                ["fa-angle-up", "tilt", -20, google.maps.ControlPosition.TOP_CENTER],
+                ["fa-angle-down", "tilt", 20, google.maps.ControlPosition.BOTTOM_CENTER],
+                ["fa-angle-left", "rotate", 20, google.maps.ControlPosition.LEFT_CENTER],
+                ["fa-angle-right", "rotate", -20, google.maps.ControlPosition.RIGHT_CENTER]
+            ];
+
+            buttons.forEach(([iconClass, mode, amount, position]) => {
+                const controlDiv = document.createElement("div");
+                const controlUI = document.createElement("button");
+
+                controlUI.classList.add("ui-button");
+                controlUI.innerHTML = `<i class="fa ${iconClass}"></i>`;
+                controlUI.style.backgroundColor = "#3498db";
+                controlUI.style.color = "#ffffff";
+                controlUI.style.border = "none";
+                controlUI.style.padding = "8px";
+                controlUI.style.borderRadius = "5px";
+                controlUI.style.margin = "5px";
+                controlUI.style.cursor = "pointer";
+
+                controlUI.addEventListener("mouseenter", () => {
+                    controlUI.style.backgroundColor = "#2980b9";
+                });
+
+                controlUI.addEventListener("mouseleave", () => {
+                    controlUI.style.backgroundColor = "#3498db";
+                });
+
+                controlUI.addEventListener("click", () => {
+                    adjustMap(mode, amount, map);
+                });
+
+                controlDiv.appendChild(controlUI);
+                map.controls[position].push(controlDiv);
+            });
+        }
+
+        function calculateDirection() {
+            directionService.route({
+                origin: document.getElementById("direction-source").value,
+                destination: document.getElementById("direction-destination").value,
+                travelMode: "DRIVING"
+            }, function (result, status) {
+                if (status == "OK") {
+                    directionRenderer.setDirections(result)
+                }
+            })
+        }
+
+        let routeService, routeRenderer
+        let routeDestination
+
+        function initRoute(lat, lon) {
+            var latlng = new google.maps.LatLng(lat, lon)
+
+            const map = new google.maps.Map(document.getElementById("route"), {
+                center: latlng,
+                zoom: 20,
+                mapTypeControlOptions: {
+                    mapTypeIds: ["roadmap", "satellite", "hybrid", "terrain", "night_map"],
+                },
+                mapId: "90f87356969d889c",
+                zoomControl: true,
+                mapTypeControl: true,
+                scaleControl: true,
+                streetViewControl: true,
+                rotateControl: true,
+                fullscreenControl: true
+            })
+
+            map.mapTypes.set("night_map", nightMapType)
+
+            if (new Date().getHours() > timeMilestone) {
+                map.setMapTypeId("night_map");
+            }
+
+            routeService = new google.maps.DirectionsService()
+            routeRenderer = new google.maps.DirectionsRenderer()
+            routeRenderer.setMap(map)
+
+            routeDestination = new google.maps.places.Autocomplete(
+                document.getElementById("route-destination")
+            )
+
+            const buttons = [
+                ["fa-angle-up", "tilt", -20, google.maps.ControlPosition.TOP_CENTER],
+                ["fa-angle-down", "tilt", 20, google.maps.ControlPosition.BOTTOM_CENTER],
+                ["fa-angle-left", "rotate", 20, google.maps.ControlPosition.LEFT_CENTER],
+                ["fa-angle-right", "rotate", -20, google.maps.ControlPosition.RIGHT_CENTER]
+            ];
+
+            buttons.forEach(([iconClass, mode, amount, position]) => {
+                const controlDiv = document.createElement("div");
+                const controlUI = document.createElement("button");
+
+                controlUI.classList.add("ui-button");
+                controlUI.innerHTML = `<i class="fa ${iconClass}"></i>`;
+                controlUI.style.backgroundColor = "#3498db";
+                controlUI.style.color = "#ffffff";
+                controlUI.style.border = "none";
+                controlUI.style.padding = "8px";
+                controlUI.style.borderRadius = "5px";
+                controlUI.style.margin = "5px";
+                controlUI.style.cursor = "pointer";
+
+                controlUI.addEventListener("mouseenter", () => {
+                    controlUI.style.backgroundColor = "#2980b9";
+                });
+
+                controlUI.addEventListener("mouseleave", () => {
+                    controlUI.style.backgroundColor = "#3498db";
+                });
+
+                controlUI.addEventListener("click", () => {
+                    adjustMap(mode, amount, map);
+                });
+
+                controlDiv.appendChild(controlUI);
+                map.controls[position].push(controlDiv);
+            });
+        }
+
+        function calculateRoute(lat, lon) {
+            return new Promise((resolve, reject) => {
+                routeService.route({
+                    origin: `${lat},${lon}`,
+                    destination: document.getElementById("route-destination").value,
+                    travelMode: "DRIVING"
+                }, function (result, status) {
+                    if (status == "OK") {
+                        routeRenderer.setDirections(result);
+
+                        resolve(result.routes[0].legs.reduce(function (sum, leg) {
+                            return sum + leg.distance.value;
+                        }, 0));
+                    } else {
+                        reject("Error calculating route");
+                    }
+                });
+            });
+        }
+
+        let waypointsService, waypointsRenderer
+        let waypointsSource, waypointsDestination
+
+        function initWaypoints(lat, lon) {
+            var latlng = new google.maps.LatLng(lat, lon)
+
+            const map = new google.maps.Map(document.getElementById("waypoints"), {
+                center: latlng,
+                zoom: 20,
+                mapTypeControlOptions: {
+                    mapTypeIds: ["roadmap", "satellite", "hybrid", "terrain", "night_map"],
+                },
+                mapId: "90f87356969d889c",
+                zoomControl: true,
+                mapTypeControl: true,
+                scaleControl: true,
+                streetViewControl: true,
+                rotateControl: true,
+                fullscreenControl: true
+            })
+
+            map.mapTypes.set("night_map", nightMapType)
+
+            if (new Date().getHours() > timeMilestone) {
+                map.setMapTypeId("night_map");
+            }
+
+            waypointsService = new google.maps.DirectionsService()
+            waypointsRenderer = new google.maps.DirectionsRenderer()
+            waypointsRenderer.setMap(map)
+
+            waypointsSource = new google.maps.places.Autocomplete(
+                document.getElementById("waypoints-source")
+            )
+
+            waypointsDestination = new google.maps.places.Autocomplete(
+                document.getElementById("waypoints-destination")
+            )
+
+            const buttons = [
+                ["fa-angle-up", "tilt", -20, google.maps.ControlPosition.TOP_CENTER],
+                ["fa-angle-down", "tilt", 20, google.maps.ControlPosition.BOTTOM_CENTER],
+                ["fa-angle-left", "rotate", 20, google.maps.ControlPosition.LEFT_CENTER],
+                ["fa-angle-right", "rotate", -20, google.maps.ControlPosition.RIGHT_CENTER]
+            ];
+
+            buttons.forEach(([iconClass, mode, amount, position]) => {
+                const controlDiv = document.createElement("div");
+                const controlUI = document.createElement("button");
+
+                controlUI.classList.add("ui-button");
+                controlUI.innerHTML = `<i class="fa ${iconClass}"></i>`;
+                controlUI.style.backgroundColor = "#3498db";
+                controlUI.style.color = "#ffffff";
+                controlUI.style.border = "none";
+                controlUI.style.padding = "8px";
+                controlUI.style.borderRadius = "5px";
+                controlUI.style.margin = "5px";
+                controlUI.style.cursor = "pointer";
+
+                controlUI.addEventListener("mouseenter", () => {
+                    controlUI.style.backgroundColor = "#2980b9";
+                });
+
+                controlUI.addEventListener("mouseleave", () => {
+                    controlUI.style.backgroundColor = "#3498db";
+                });
+
+                controlUI.addEventListener("click", () => {
+                    adjustMap(mode, amount, map);
+                });
+
+                controlDiv.appendChild(controlUI);
+                map.controls[position].push(controlDiv);
+            });
+        }
+
+        function calculateWaypoints() {
+            waypointsService.route({
+                origin: document.getElementById("waypoints-source").value,
+                destination: document.getElementById("waypoints-destination").value,
+                travelMode: "DRIVING"
+            }, function (result, status) {
+                if (status == "OK") {
+                    waypointsRenderer.setDirections(result)
+                }
+            })
+        }
+
+        const adjustMap = function (mode, amount, map) {
+            switch (mode) {
+                case "tilt": {
+                    map.setTilt(map.getTilt() + amount)
+                    break
+                }
+                case "rotate": {
+                    map.setHeading(map.getHeading() + amount)
+                    break
+                }
+                default: {
+                    break
+                }
+            }
+        }
+    </script>
 </body>
 
 </html>
