@@ -9,7 +9,7 @@
 
 <PageTitle>Google Map Routes</PageTitle>
 
-@if(Route is null)
+@if (Route is null)
 {
     <LoadingIndicator />
 }
@@ -26,7 +26,7 @@ else
                     <InputText class="form-control text-center" id="route-destination" @bind-Value="Route.DestinationLocation" />
 
                     <div class="mt-3">
-                        <button type="submit" class="btn btn-success">Start</button>
+                        <button type="submit" class="btn btn-success" disabled="@IsWatching">Start</button>
                         <button type="button" class="btn btn-danger" @onclick="HandleReset">Reset</button>
                     </div>
                 </div>

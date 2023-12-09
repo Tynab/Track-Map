@@ -6,6 +6,7 @@
 @using TrackMap.Services
 @using YANLib
 @using static System.Enum
+@using static TrackMap.Common.Enums.Status
 
 @inject IConfiguration Configuration
 @inject IToastService ToastService
@@ -16,7 +17,7 @@
 
 <PageTitle>User detail</PageTitle>
 
-@if (User is null || Devices.IsEmptyOrNull())
+@if (User is null)
 {
     <LoadingIndicator />
 }
@@ -104,7 +105,6 @@ else
                 <th>Device Type</th>
                 <th>Device OS</th>
                 <th>Location</th>
-                <th>Created Date</th>
                 <th>Last Login</th>
                 <th>Status</th>
                 <th />
@@ -112,31 +112,42 @@ else
         </thead>
 
         <tbody>
-            @foreach (var device in Devices)
+            @if (Devices.IsNotEmptyAndNull())
             {
-                <tr class="align-middle">
-                    <td>@device.IpAddress</td>
+                @foreach (var device in Devices)
+                {
+                    <tr class="align-middle">
+                        <td>@device.IpAddress</td>
 
-                    <td>
-                        <DeviceTypeLabel DeviceType="device.DeviceType" />
-                    </td>
+                        <td>
+                            <DeviceTypeLabel DeviceType="device.DeviceType" />
+                        </td>
 
-                    <td>
-                        <DeviceOsLabel DeviceOs="device.DeviceOs" />
-                    </td>
+                        <td>
+                            <DeviceOsLabel DeviceOs="device.DeviceOs" />
+                        </td>
 
-                    <td>@($"{device.Latitude.Round(7)}, {device.Longitude.Round(7)}")</td>
-                    <td>@device.CreatedAt.ToString(Configuration["DateFormat"])</td>
-                    <td>@device.LastLogin.ToString(Configuration["DateFormat"])</td>
+                        <td>@($"{device.Latitude.Round(7)}, {device.Longitude.Round(7)}")</td>
+                        <td>@device.LastLogin.ToString(Configuration["DateFormat"])</td>
 
-                    <td>
-                        <StatusLabel Status="device.Status" />
-                    </td>
+                        <td>
+                            <StatusLabel Status="device.Status" />
+                        </td>
 
-                    <td>
-                        <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
-                    </td>
-                </tr>
+                        <td>
+                            @if (device.Status is Active)
+                            {
+                                <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
+                                <button type="button" class="btn btn-danger" disabled="@true">Delete</button>
+                            }
+                            else
+                            {
+                                <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
+                                <a href="/device-delete/@device.Id" class="btn btn-danger">Delete</a>
+                            }
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>

@@ -74,7 +74,8 @@ public sealed class TrackMapDbContextSeed
                         LastLogin = Now,
                         UserId = userIds[i],
                         CreatedBy = userIds[i],
-                        CreatedAt = Now
+                        CreatedAt = Now,
+                        IsActive = true
                     };
                 }));
             }

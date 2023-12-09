@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackMap", "TrackMap\TrackMap.csproj", "{D6642DA0-BEB5-4DA0-B728-4E81BB458A66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrackMap", "TrackMap\TrackMap.csproj", "{D6642DA0-BEB5-4DA0-B728-4E81BB458A66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackMap.Api", "TrackMap.Api\TrackMap.Api.csproj", "{677E48DC-5AD4-4C95-866B-864B8B512B4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrackMap.Api", "TrackMap.Api\TrackMap.Api.csproj", "{677E48DC-5AD4-4C95-866B-864B8B512B4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackMap.Common", "TrackMap.Common\TrackMap.Common.csproj", "{EC7F9C47-2F84-44DE-A614-3FED02CEC93D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrackMap.Common", "TrackMap.Common\TrackMap.Common.csproj", "{EC7F9C47-2F84-44DE-A614-3FED02CEC93D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

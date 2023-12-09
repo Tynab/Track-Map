@@ -6,6 +6,7 @@
 @using TrackMap.Services
 @using YANLib
 @using static System.Enum
+@using static TrackMap.Common.Enums.Status
 
 @inject IConfiguration Configuration
 @inject IToastService ToastService
@@ -85,7 +86,6 @@ else
                 <th>Device Type</th>
                 <th>Device OS</th>
                 <th>Location</th>
-                <th>Created Date</th>
                 <th>Last Login</th>
                 <th>Status</th>
                 <th />
@@ -107,7 +107,6 @@ else
                     </td>
 
                     <td>@($"{device.Latitude.Round(7)}, {device.Longitude.Round(7)}")</td>
-                    <td>@device.CreatedAt.ToString(Configuration["DateFormat"])</td>
                     <td>@device.LastLogin.ToString(Configuration["DateFormat"])</td>
 
                     <td>
@@ -115,8 +114,18 @@ else
                     </td>
 
                     <td>
-                        <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
-                        <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
+                        @if (device.Status is Active)
+                        {
+                            <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
+                            <button type="button" class="btn btn-danger" disabled="@true">Delete</button>
+                            <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
+                        }
+                        else
+                        {
+                            <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
+                            <a href="/device-delete/@device.Id" class="btn btn-danger">Delete</a>
+                            <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
+                        }
                     </td>
                 </tr>
             }

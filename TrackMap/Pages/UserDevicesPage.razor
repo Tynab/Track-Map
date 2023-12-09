@@ -16,7 +16,7 @@
 
 <PageTitle>Device list</PageTitle>
 
-@if (Users.IsEmptyOrNull() || Devices.IsEmptyOrNull())
+@if (Users.IsEmptyOrNull())
 {
     <LoadingIndicator />
 }
@@ -93,32 +93,35 @@ else
         </thead>
 
         <tbody>
-            @foreach (var device in Devices)
+            @if (Devices.IsNotEmptyAndNull())
             {
-                <tr class="align-middle">
-                    <td>@device.IpAddress</td>
+                @foreach (var device in Devices)
+                {
+                    <tr class="align-middle">
+                        <td>@device.IpAddress</td>
 
-                    <td>
-                        <DeviceTypeLabel DeviceType="device.DeviceType" />
-                    </td>
+                        <td>
+                            <DeviceTypeLabel DeviceType="device.DeviceType" />
+                        </td>
 
-                    <td>
-                        <DeviceOsLabel DeviceOs="device.DeviceOs" />
-                    </td>
+                        <td>
+                            <DeviceOsLabel DeviceOs="device.DeviceOs" />
+                        </td>
 
-                    <td>@($"{device.Latitude.Round(7)}, {device.Longitude.Round()}")</td>
-                    <td>@device.CreatedAt.ToString(Configuration["DateFormat"])</td>
-                    <td>@device.LastLogin.ToString(Configuration["DateFormat"])</td>
+                        <td>@($"{device.Latitude.Round(7)}, {device.Longitude.Round()}")</td>
+                        <td>@device.CreatedAt.ToString(Configuration["DateFormat"])</td>
+                        <td>@device.LastLogin.ToString(Configuration["DateFormat"])</td>
 
-                    <td>
-                        <StatusLabel Status="device.Status" />
-                    </td>
+                        <td>
+                            <StatusLabel Status="device.Status" />
+                        </td>
 
-                    <td>
-                        <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
-                        <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
-                    </td>
-                </tr>
+                        <td>
+                            <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
+                            <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>

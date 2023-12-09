@@ -60,21 +60,27 @@ else
         <tbody>
             @foreach (var user in Users)
             {
-                @if (user.Id != User.Id)
-                {
-                    <tr class="align-middle">
-                        <td>@user.UserName</td>
-                        <td>@(user.FullName ?? "N/A")</td>
-                        <td>@(user.Email ?? "N/A")</td>
-                        <td>@(user.PhoneNumber ?? "N/A")</td>
+                <tr class="align-middle">
+                    <td>@user.UserName</td>
+                    <td>@(user.FullName ?? "N/A")</td>
+                    <td>@(user.Email ?? "N/A")</td>
+                    <td>@(user.PhoneNumber ?? "N/A")</td>
 
-                        <td>
+                    <td>
+                        @if (user.Id == User.Id)
+                        {
+                            <a href="/user-detail/@user.Id" class="btn btn-secondary">Detail</a>
+                            <button type="button" class="btn btn-danger" disabled="@true">Delete</button>
+                            <a href="/user-devices/@user.Id" class="btn btn-warning">Devices</a>
+                        }
+                        else
+                        {
                             <a href="/user-detail/@user.Id" class="btn btn-secondary">Detail</a>
                             <a href="/user-delete/@user.Id" class="btn btn-danger">Delete</a>
                             <a href="/user-devices/@user.Id" class="btn btn-warning">Devices</a>
-                        </td>
-                    </tr>
-                }
+                        }
+                    </td>
+                </tr>
             }
         </tbody>
     </table>
