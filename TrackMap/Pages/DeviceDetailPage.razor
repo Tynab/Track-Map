@@ -2,13 +2,15 @@
 
 @using Microsoft.AspNetCore.Authorization
 @using TrackMap.Components
+@using TrackMap.Services
 
-@inject IConfiguration Configuration;
+@inject IConfiguration Configuration
+@inject IToastService ToastService
+@inject IDeviceService DeviceService
 
 @attribute [Authorize]
 
 <PageTitle>Device detail</PageTitle>
-<h1>Device detail</h1>
 
 @if (Device is null)
 {
@@ -16,9 +18,10 @@
 }
 else
 {
-    <h3>@Device.IpAddress</h3>
+    <h1>Device detail</h1>
+    <h3 class="mt-4">@Device.IpAddress</h3>
 
-    <table class="table">
+    <table class="table mt-3">
         <tr>
             <td>Device Type</td>
 
@@ -46,11 +49,6 @@ else
         </tr>
 
         <tr>
-            <td>LastLogin</td>
-            <td>@Device.LastLogin.ToString(Configuration["DateTimeFormat"])</td>
-        </tr>
-
-        <tr>
             <td>Created At</td>
             <td>@Device.CreatedAt.ToString(Configuration["DateTimeFormat"])</td>
         </tr>
@@ -58,6 +56,26 @@ else
         <tr>
             <td>Updated At</td>
             <td>@(Device.UpdatedAt.HasValue ? Device.UpdatedAt.Value.ToString(Configuration["DateTimeFormat"]) : "N/A")</td>
+        </tr>
+
+        <tr>
+            <td>LastLogin</td>
+            <td>@Device.LastLogin.ToString(Configuration["DateTimeFormat"])</td>
+        </tr>
+
+        <tr>
+            <td>Status</td>
+            <td>
+                <StatusLabel Status="@Device.Status" />
+            </td>
+        </tr>
+
+        <tr>
+            <td>User</td>
+
+            <td>
+                <a href="/user-detail/@(Device.User?.Id)">@Device.User?.UserName</a>
+            </td>
         </tr>
     </table>
 }

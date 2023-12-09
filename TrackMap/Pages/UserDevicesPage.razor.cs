@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using TrackMap.Common.Dtos.Device;
 using TrackMap.Common.Responses;
-using static System.Threading.Tasks.Task;
+using YANLib;
 
 namespace TrackMap.Pages;
 
-public sealed partial class DevicesPage
+public sealed partial class UserDevicesPage
 {
     protected override async Task OnInitializedAsync()
     {
@@ -15,12 +15,15 @@ public sealed partial class DevicesPage
 
         if (authenticationState.User.Identity is not null && authenticationState.User.Identity.IsAuthenticated)
         {
-            var usersTask = UserService.GetAll().AsTask();
-            var devsTask = DeviceService.GetAll().AsTask();
+            Users = await UserService.GetAll().AsTask();
 
-            await WhenAll(usersTask, devsTask);
-            Users = await usersTask;
-            Devices = await devsTask;
+            if (Id.IsNotWhiteSpaceAndNull())
+            {
+                Devices = await DeviceService.Search(new DeviceSearchDto
+                {
+                    UserId = new Guid(Id)
+                });
+            }
         }
     }
 
@@ -29,6 +32,9 @@ public sealed partial class DevicesPage
         Devices = await DeviceService.Search(DeviceSearch);
         ToastService.ShowInfo("Seach completed");
     }
+
+    [Parameter]
+    public string? Id { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; }

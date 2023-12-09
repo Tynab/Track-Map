@@ -25,4 +25,6 @@ public sealed record DeviceDto
     public Guid? UpdatedBy { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    public Status Status { get; set; }
 }

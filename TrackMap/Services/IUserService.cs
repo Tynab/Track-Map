@@ -10,9 +10,13 @@ public interface IUserService
 
     public ValueTask<UserResponse?> Get(Guid id);
 
-    public ValueTask<List<UserResponse>?> Search(UserSearchDto dto);
+    public ValueTask<List<UserResponse>?> Search(UserSearchDto? dto);
 
-    public ValueTask<bool> Create(UserCreateRequest request);
+    public ValueTask<bool> Create(UserCreateRequest? request);
 
-    public ValueTask<bool> Edit(Guid id, UserEditRequest request);
+    public ValueTask<bool> Edit(Guid id, UserEditRequest? request);
+
+    public ValueTask<bool> Update(Guid id, UserUpdateRequest? request);
+
+    public ValueTask<bool> Delete(Guid id);
 }

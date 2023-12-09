@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace TrackMap.Common.Requests.User;
 
@@ -12,8 +12,6 @@ public sealed class UserUpdateRequest
 
     public string? FullName { get; set; }
 
-    public required Guid UpdatedBy { get; set; }
-
-    [DefaultValue(true)]
-    public bool? IsActive { get; set; } = true;
+    [Required]
+    public Guid UpdatedBy { get; set; }
 }

@@ -1,6 +1,7 @@
 ﻿using BrowserInterop.Extensions;
 using BrowserInterop.Geolocation;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using TrackMap.Common.Dtos;
 using static System.Threading.Tasks.Task;
@@ -21,16 +22,21 @@ public sealed partial class TestPage : IAsyncDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        Wrapper = (await (await JSRuntime.Window()).Navigator()).Geolocation;
-        Route.Latitude = _latSrc;
-        Route.Longitude = _lngSrc;
+        var authenticationState = await AuthenticationState!;
+
+        if (authenticationState.User.Identity is not null && authenticationState.User.Identity.IsAuthenticated)
+        {
+            Wrapper = (await (await JSRuntime.Window()).Navigator()).Geolocation;
+            Route.Latitude = _latSrc;
+            Route.Longitude = _lngSrc;
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await JSRuntime!.InvokeVoidAsync("initRoute", _latSrc, _lngSrc);
+            await JSRuntime.InvokeVoidAsync("initRoute", _latSrc, _lngSrc);
             StateHasChanged();
         }
     }
@@ -61,7 +67,7 @@ public sealed partial class TestPage : IAsyncDisposable
                     }
 
                     StateHasChanged();
-                    await JSRuntime!.InvokeVoidAsync("calculateRoute", Route.Latitude, Route.Longitude);
+                    await JSRuntime.InvokeVoidAsync("calculateRoute", Route.Latitude, Route.Longitude);
                     await Delay(_timeStep);
                 }
 
@@ -74,7 +80,7 @@ public sealed partial class TestPage : IAsyncDisposable
     {
         await StopWatch();
         StateHasChanged();
-        await JSRuntime!.InvokeVoidAsync("initRoute", Route.Latitude, Route.Longitude);
+        await JSRuntime.InvokeVoidAsync("initRoute", Route.Latitude, Route.Longitude);
     }
 
     private async Task StopWatch()
@@ -90,8 +96,8 @@ public sealed partial class TestPage : IAsyncDisposable
 
     public async ValueTask DisposeAsync() => await StopWatch();
 
-    [Inject]
-    private IJSRuntime? JSRuntime { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
 
     private IAsyncDisposable? Watcher { get; set; }
 

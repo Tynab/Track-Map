@@ -1,0 +1,8 @@
+@TrackMap.Api_HostAddress = https://localhost:7083
+
+GET {{TrackMap.Api_HostAddress}}/api/users
+
+###
+GET {{TrackMap.Api_HostAddress}}/api/devices
+
+###

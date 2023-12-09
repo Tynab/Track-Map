@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization;
+﻿@using Microsoft.AspNetCore.Components.Authorization
 @using TrackMap.Components
 
 <Router AppAssembly="@typeof(App).Assembly">
@@ -8,16 +8,15 @@
                 <RedirectToLogin />
             </NotAuthorized>
         </AuthorizeRouteView>
+
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
 
     <NotFound>
-        <CascadingAuthenticationState>
-            <PageTitle>Not found</PageTitle>
+        <PageTitle>Not found</PageTitle>
 
-            <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
-            </LayoutView>
-        </CascadingAuthenticationState>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
     </NotFound>
 </Router>

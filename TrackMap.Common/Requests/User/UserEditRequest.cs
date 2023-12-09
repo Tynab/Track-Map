@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace TrackMap.Common.Requests.User;
+﻿namespace TrackMap.Common.Requests.User;
 
 public sealed class UserEditRequest
 {
@@ -13,7 +11,4 @@ public sealed class UserEditRequest
     public required string FullName { get; set; }
 
     public required Guid UpdatedBy { get; set; }
-
-    [DefaultValue(true)]
-    public required bool IsActive { get; set; } = true;
 }

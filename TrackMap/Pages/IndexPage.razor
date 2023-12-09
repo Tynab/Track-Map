@@ -1,11 +1,15 @@
 ﻿@page "/"
 
+@using Blazored.LocalStorage
 @using Microsoft.AspNetCore.Authorization
+@using TrackMap.Services
+
+@inject IJSRuntime JSRuntime
+@inject ILocalStorageService LocalStorageService
+@inject IDeviceService DeviceService
 
 @attribute [Authorize]
 
-<PageTitle>Home</PageTitle>
-<h1>Home</h1>
-<div id="map" style="height:500px;width:100%;" />
-<div id="request"></div>
-<div id="response"></div>
+<PageTitle>Google Map Places</PageTitle>
+<h1>Google Map Places</h1>
+<div class="mt-4" id="map" style="height:600px;width:100%;" />

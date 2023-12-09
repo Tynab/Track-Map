@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using TrackMap.Services;
+using static System.Threading.Tasks.Task;
 
 namespace TrackMap.Pages;
 
@@ -7,13 +7,11 @@ public sealed partial class LogoutPage
 {
     protected override async Task OnInitializedAsync()
     {
-        await AuthService!.Logout();
-        NavigationManager?.NavigateTo("/");
+        var clrTask = LocalStorageService.RemoveItemAsync("profile").AsTask();
+        var outTask = AuthService.Logout().AsTask();
+
+        await WhenAll(clrTask, outTask);
+        ToastService.ShowSuccess("Logout successful");
+        NavigationManager.NavigateTo("/login");
     }
-
-    [Inject]
-    private NavigationManager? NavigationManager { get; set; }
-
-    [Inject]
-    private IAuthService? AuthService { get; set; }
 }

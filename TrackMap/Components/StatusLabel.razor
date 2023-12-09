@@ -1,0 +1,20 @@
+﻿@using TrackMap.Common.Enums
+
+@switch (Status)
+{
+    case Status.Active:
+        {
+            <span class="badge bg-success">@nameof(Status.Active)</span>
+            break;
+        }
+    case Status.Inactive:
+        {
+            <span class="badge bg-secondary">@nameof(Status.Inactive)</span>
+            break;
+        }
+}
+
+@code {
+    [Parameter]
+    public Status Status { get; set; }
+}

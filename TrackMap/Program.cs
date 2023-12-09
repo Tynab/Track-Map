@@ -13,8 +13,8 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddBlazorBootstrap();
 builder.Services.AddBlazoredToast();
-builder.Services.AddSingleton<AppState>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IDeviceService, DeviceService>();
@@ -22,7 +22,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStatePr
 
 builder.Services.AddScoped(s => new HttpClient
 {
-    BaseAddress = new Uri(builder.Configuration["BackendApiUrl"] ?? "https://localhost:7267/")
+    BaseAddress = new Uri(builder.Configuration["BackendApiUrl"] ?? "https://localhost:7083/")
 });
 
 await builder.Build().RunAsync();

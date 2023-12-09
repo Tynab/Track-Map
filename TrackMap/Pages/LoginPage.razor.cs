@@ -1,7 +1,8 @@
-﻿using Blazored.Toast.Services;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using TrackMap.Common.Dtos.User;
 using TrackMap.Common.Requests;
-using TrackMap.Services;
+using YANLib;
 
 namespace TrackMap.Pages;
 
@@ -11,7 +12,7 @@ public sealed partial class LoginPage
     {
         ShowErrors = default;
 
-        var rslt = await AuthService!.Login(Login);
+        var rslt = await AuthService.Login(Login);
 
         if (rslt is null)
         {
@@ -22,8 +23,18 @@ public sealed partial class LoginPage
         {
             if (rslt.Success)
             {
-                ToastService!.ShowSuccess("Login successful");
-                NavigationManager?.NavigateTo("/");
+                var authenticationState = await AuthenticationState!;
+
+                if (authenticationState.User.Identity is not null && authenticationState.User.Identity.Name.IsNotWhiteSpaceAndNull())
+                {
+                    await LocalStorageService.SetItemAsync("profile", (await UserService.Search(new UserSearchDto
+                    {
+                        UserName = authenticationState.User.Identity.Name
+                    }))?.FirstOrDefault());
+                }
+
+                ToastService.ShowSuccess("Login successful");
+                NavigationManager.NavigateTo("/");
             }
             else
             {
@@ -33,18 +44,12 @@ public sealed partial class LoginPage
         }
     }
 
-    [Inject]
-    private NavigationManager? NavigationManager { get; set; }
-
-    [Inject]
-    private IToastService? ToastService { get; set; }
-
-    [Inject]
-    private IAuthService? AuthService { get; set; }
-
-    private LoginRequest Login { get; set; } = new LoginRequest();
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
 
     private bool ShowErrors { get; set; }
 
     private string Error { get; set; } = string.Empty;
+
+    private LoginRequest Login { get; set; } = new LoginRequest();
 }

@@ -15,7 +15,7 @@ public sealed class DeviceRepository(ILogger<DeviceRepository> logger, TrackMapD
     {
         try
         {
-            return await _dbContext.Devices.Where(x => x.IsActive == true).OrderByDescending(x => x.LastLogin).Include(x => x.User).AsNoTracking().ToArrayAsync();
+            return await _dbContext.Devices.OrderByDescending(x => x.LastLogin).Include(x => x.User).AsNoTracking().ToArrayAsync();
         }
         catch (Exception ex)
         {
@@ -29,7 +29,7 @@ public sealed class DeviceRepository(ILogger<DeviceRepository> logger, TrackMapD
     {
         try
         {
-            return await _dbContext.Devices.Include(x => x.User).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id && x.IsActive == true);
+            return await _dbContext.Devices.Include(x => x.User).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         }
         catch (Exception ex)
         {
@@ -55,9 +55,41 @@ public sealed class DeviceRepository(ILogger<DeviceRepository> logger, TrackMapD
                 qry = qry.Where(x => x.DeviceType == dto.DeviceOs.Value.ToString());
             }
 
+            if (dto.IpAddress.IsNotWhiteSpaceAndNull())
+            {
+                qry = qry.Where(x => x.IpAddress == dto.IpAddress);
+            }
+
+            if (dto.Latitude.HasValue)
+            {
+                qry = qry.Where(x => x.Latitude == dto.Latitude);
+            }
+
+            if (dto.Longitude.HasValue)
+            {
+                qry = qry.Where(x => x.Longitude == dto.Longitude);
+            }
+
             if (dto.UserId.HasValue)
             {
                 qry = qry.Where(x => x.UserId == dto.UserId.Value);
+            }
+
+            if (dto.CreatedBy.HasValue)
+            {
+                qry = qry.Where(x => x.CreatedBy == dto.CreatedBy.Value);
+            }
+
+            if (dto.UpdatedBy.HasValue)
+            {
+                qry = qry.Where(x => x.UpdatedBy == dto.UpdatedBy.Value);
+            }
+
+            if (dto.Status.HasValue)
+            {
+                var act = dto.Status.Value.ToBool();
+
+                qry = qry.Where(x => x.IsActive == act);
             }
 
             return await qry.OrderByDescending(x => x.LastLogin).Include(x => x.User).AsNoTracking().ToArrayAsync();
@@ -78,7 +110,7 @@ public sealed class DeviceRepository(ILogger<DeviceRepository> logger, TrackMapD
 
             if (await _dbContext.SaveChangesAsync() > 0)
             {
-                entry.Entity.User = await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == entity.UserId && x.IsActive == true);
+                entry.Entity.User = await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == entity.UserId);
 
                 return entry.Entity;
             }
@@ -103,7 +135,7 @@ public sealed class DeviceRepository(ILogger<DeviceRepository> logger, TrackMapD
 
             if (await _dbContext.SaveChangesAsync() > 0)
             {
-                entry.Entity.User = await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == entry.Entity.UserId && x.IsActive == true);
+                entry.Entity.User = await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == entry.Entity.UserId);
 
                 return entry.Entity;
             }
@@ -131,6 +163,20 @@ public sealed class DeviceRepository(ILogger<DeviceRepository> logger, TrackMapD
         catch (Exception ex)
         {
             _logger.LogError(ex, "DeleteDeviceRepository-Exception: {Entity}", entity.Serialize());
+
+            throw;
+        }
+    }
+
+    public async ValueTask<bool> DeactivebyUser(Guid userId)
+    {
+        try
+        {
+            return await _dbContext.Devices.Where(x => x.UserId == userId && x.IsActive == true).AsNoTracking().ExecuteUpdateAsync(s => s.SetProperty(x => x.IsActive, false)) > 0 && await _dbContext.SaveChangesAsync() > 0;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "DeactivebyUserDeviceRepository-Exception: {UserId}", userId);
 
             throw;
         }

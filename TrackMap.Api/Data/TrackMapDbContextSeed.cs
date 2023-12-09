@@ -7,7 +7,6 @@ using static System.DateTime;
 using static System.Enum;
 using static System.Guid;
 using static System.Linq.Enumerable;
-using static TrackMap.Common.Utilities.DeviceUtil;
 using static YANLib.YANNum;
 
 namespace TrackMap.Api.Data;
@@ -16,7 +15,7 @@ public sealed class TrackMapDbContextSeed
 {
     private readonly PasswordHasher<User> _passwordHasher = new();
 
-    public async Task SeedAsync(ILogger<TrackMapDbContextSeed> logger, TrackMapDbContext context)
+    public async Task SeedAsync(ILogger<TrackMapDbContextSeed>? logger, TrackMapDbContext context)
     {
         try
         {
@@ -42,7 +41,6 @@ public sealed class TrackMapDbContextSeed
                         PhoneNumber = $"0{GenerateRandomInt(111111111, 999999999)}",
                         CreatedBy = userIds[i],
                         CreatedAt = Now,
-                        IsActive = true,
                         SecurityStamp = NewGuid().ToString(),
                         UserName = userNames[i],
                         NormalizedUserName = userNames[i].ToUpperInvariant()
@@ -76,8 +74,7 @@ public sealed class TrackMapDbContextSeed
                         LastLogin = Now,
                         UserId = userIds[i],
                         CreatedBy = userIds[i],
-                        CreatedAt = Now,
-                        IsActive = true,
+                        CreatedAt = Now
                     };
                 }));
             }
@@ -86,7 +83,7 @@ public sealed class TrackMapDbContextSeed
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "SeedAsyncTrackMapDbContextSeed-Exception");
+            logger?.LogError(ex, "SeedAsyncTrackMapDbContextSeed-Exception");
 
             throw;
         }

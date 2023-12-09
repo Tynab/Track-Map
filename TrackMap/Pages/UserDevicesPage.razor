@@ -1,4 +1,4 @@
-﻿@page "/devices"
+﻿@page "/user-devices/{id}"
 
 @using Microsoft.AspNetCore.Authorization
 @using TrackMap.Common.Enums
@@ -106,7 +106,7 @@ else
                         <DeviceOsLabel DeviceOs="device.DeviceOs" />
                     </td>
 
-                    <td>@($"{device.Latitude.Round(7)}, {device.Longitude.Round(7)}")</td>
+                    <td>@($"{device.Latitude.Round(7)}, {device.Longitude.Round()}")</td>
                     <td>@device.CreatedAt.ToString(Configuration["DateFormat"])</td>
                     <td>@device.LastLogin.ToString(Configuration["DateFormat"])</td>
 

@@ -22,6 +22,15 @@ public sealed class RegisterController(ILogger<RegisterController> logger, UserM
     {
         try
         {
+            if (request.UserName.IsWhiteSpaceOrNull() || request.Password.IsWhiteSpaceOrNull())
+            {
+                return BadRequest(new LoginResponse
+                {
+                    Success = false,
+                    Error = "Username and Password are invalid"
+                });
+            }
+
             if (request.Password != request.ConfirmPassword)
             {
                 return BadRequest(new RegisterRepsonse
@@ -38,11 +47,10 @@ public sealed class RegisterController(ILogger<RegisterController> logger, UserM
                 Id = id,
                 CreatedBy = id,
                 CreatedAt = Now,
-                IsActive = true,
                 SecurityStamp = NewGuid().ToString(),
                 UserName = request.UserName,
-                NormalizedUserName = request.UserName!.ToUpperInvariant()
-            }, request.Password!);
+                NormalizedUserName = request.UserName.ToUpperInvariant()
+            }, request.Password);
 
             return Ok(result.Succeeded
                 ? new RegisterRepsonse

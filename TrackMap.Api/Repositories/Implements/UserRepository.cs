@@ -15,7 +15,7 @@ public sealed class UserRepository(ILogger<UserRepository> logger, TrackMapDbCon
     {
         try
         {
-            return await _dbContext.Users.Where(x => x.IsActive == true).OrderBy(x => x.FullName).Include(x => x.Devices).AsNoTracking().ToArrayAsync();
+            return await _dbContext.Users.OrderBy(x => x.FullName).Include(x => x.Devices).AsNoTracking().ToArrayAsync();
         }
         catch (Exception ex)
         {
@@ -29,7 +29,7 @@ public sealed class UserRepository(ILogger<UserRepository> logger, TrackMapDbCon
     {
         try
         {
-            return await _dbContext.Users.Include(x => x.Devices).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id && x.IsActive == true);
+            return await _dbContext.Users.Include(x => x.Devices).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         }
         catch (Exception ex)
         {
@@ -58,6 +58,21 @@ public sealed class UserRepository(ILogger<UserRepository> logger, TrackMapDbCon
             if (dto.PhoneNumber.IsNotWhiteSpaceAndNull())
             {
                 qry = qry.Where(x => x.PhoneNumber!.Contains(dto.PhoneNumber));
+            }
+
+            if (dto.UserName.IsNotWhiteSpaceAndNull())
+            {
+                qry = qry.Where(x => x.UserName!.Contains(dto.UserName));
+            }
+
+            if (dto.CreatedBy.HasValue)
+            {
+                qry = qry.Where(x => x.CreatedBy == dto.CreatedBy.Value);
+            }
+
+            if (dto.UpdatedBy.HasValue)
+            {
+                qry = qry.Where(x => x.UpdatedBy == dto.UpdatedBy.Value);
             }
 
             return await qry.OrderBy(x => x.FullName).Include(x => x.Devices).AsNoTracking().ToArrayAsync();
@@ -94,7 +109,7 @@ public sealed class UserRepository(ILogger<UserRepository> logger, TrackMapDbCon
 
             if (await _dbContext.SaveChangesAsync() > 0)
             {
-                entry.Entity.Devices = await _dbContext.Devices.Where(x => x.UserId == entity.Id && x.IsActive == true).AsNoTracking().ToArrayAsync();
+                entry.Entity.Devices = await _dbContext.Devices.Where(x => x.UserId == entity.Id).AsNoTracking().ToArrayAsync();
 
                 return entry.Entity;
             }

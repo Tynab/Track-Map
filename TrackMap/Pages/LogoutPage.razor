@@ -1,1 +1,9 @@
 ﻿@page "/logout"
+
+@using Blazored.LocalStorage
+@using TrackMap.Services
+
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorageService
+@inject IToastService ToastService
+@inject IAuthService AuthService

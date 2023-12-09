@@ -1,30 +1,38 @@
 ﻿@page "/route"
 
-<PageTitle>Google Map route</PageTitle>
-<h1>Google Map route</h1>
+@using Microsoft.AspNetCore.Authorization
+@using TrackMap.Components
 
-<div class="row text-center">
-    <EditForm Model="Route" OnValidSubmit="HandleRoute">
-        <DataAnnotationsValidator />
-        <label>Destination Location</label>
+@inject IJSRuntime JSRuntime
 
-        <div class="d-flex justify-content-center">
-            <div class="w-50">
-                <div class="row">
-                    <InputText class="form-control text-center" id="route-destination" @bind-Value="Route!.DestinationLocation" />
-                </div>
+@attribute [Authorize]
 
-                <div class="row mt-3">
-                    <div>
+<PageTitle>Google Map Routes</PageTitle>
+
+@if(Route is null)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <h1>Google Map Routes</h1>
+
+    <div class="text-center mt-4">
+        <EditForm Model="Route" OnValidSubmit="HandleRoute">
+            <DataAnnotationsValidator />
+
+            <div class="d-flex justify-content-center">
+                <div class="w-50">
+                    <InputText class="form-control text-center" id="route-destination" @bind-Value="Route.DestinationLocation" />
+
+                    <div class="mt-3">
                         <button type="submit" class="btn btn-success">Start</button>
                         <button type="button" class="btn btn-danger" @onclick="HandleReset">Reset</button>
                     </div>
                 </div>
             </div>
-        </div>
-    </EditForm>
-</div>
+        </EditForm>
+    </div>
 
-<div class="row mt-4">
-    <div id="route" style="height:500px;width:100%;" />
-</div>
+    <div class="mt-4" id="route" style="height:600px;width:100%;" />
+}

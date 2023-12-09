@@ -49,7 +49,7 @@ if (app.Environment.IsDevelopment())
     _ = app.UseSwaggerUI();
 }
 
-app.MigrateDbContext<TrackMapDbContext>((c, s) => new TrackMapDbContextSeed().SeedAsync(s.GetService<ILogger<TrackMapDbContextSeed>>()!, c).Wait());
+app.MigrateDbContext<TrackMapDbContext>((c, s) => new TrackMapDbContextSeed().SeedAsync(s.GetService<ILogger<TrackMapDbContextSeed>>(), c).Wait());
 app.UseHttpsRedirection();
 app.UseCors("CorsPolicy");
 app.UseAuthentication();

@@ -3,11 +3,13 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>TrackMap</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Track Map</title>
     <base href="/" />
-    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
-    <link href="css/app.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="_content/Blazor.Bootstrap/blazor.bootstrap.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="TrackMap.styles.css" rel="stylesheet" />
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -28,11 +30,28 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
+
     <script src="_framework/blazor.webassembly.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.0.1/chart.umd.js" integrity="sha512-gQhCDsnnnUfaRzD8k1L5llCCV6O9HN09zClIzzeJ8OJ9MpGmIlCxm+pdCkqTwqJ4JcjbojFr79rl2F1mzcoLMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js" integrity="sha512-JPcRR8yFa8mmCsfrw4TNte1ZvF1e3+1SdGMslZvmrzDYxS69J7J49vkFL8u6u8PlPJK+H3voElBtUCzaXj+6ig==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="_content/Blazor.Bootstrap/blazor.bootstrap.js"></script>
     <script src="_content/BrowserInterop/scripts.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbSfMXQK82IEyOs2j3mUgZepqVquTyzxo&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASCWY-VWKaVMhu4SKiBvPbRLo9b8KrVAE&libraries=places"></script>
 
     <script>
+        function getUserAgent() {
+            return navigator.userAgent;
+        }
+
+        function getIpAddress() {
+            return fetch('https://jsonip.com/')
+                .then((response) => response.json())
+                .then((data) => {
+                    return data.ip
+                })
+        }
+
         const timeMilestone = 17
 
         const nightMapType = new google.maps.StyledMapType(
@@ -252,7 +271,7 @@
             directionService.route({
                 origin: document.getElementById("direction-source").value,
                 destination: document.getElementById("direction-destination").value,
-                travelMode: "DRIVING"
+                travelMode: google.maps.TravelMode.DRIVING
             }, function (result, status) {
                 if (status == "OK") {
                     directionRenderer.setDirections(result)
@@ -338,7 +357,7 @@
                 routeService.route({
                     origin: `${lat},${lon}`,
                     destination: document.getElementById("route-destination").value,
-                    travelMode: "DRIVING"
+                    travelMode: google.maps.TravelMode.DRIVING
                 }, function (result, status) {
                     if (status == "OK") {
                         routeRenderer.setDirections(result);
@@ -434,7 +453,7 @@
             waypointsService.route({
                 origin: document.getElementById("waypoints-source").value,
                 destination: document.getElementById("waypoints-destination").value,
-                travelMode: "DRIVING"
+                travelMode: google.maps.TravelMode.DRIVING
             }, function (result, status) {
                 if (status == "OK") {
                     waypointsRenderer.setDirections(result)

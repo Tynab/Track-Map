@@ -1,6 +1,7 @@
 ﻿using BrowserInterop.Extensions;
 using BrowserInterop.Geolocation;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using TrackMap.Common.Dtos;
@@ -17,8 +18,13 @@ public sealed partial class RoutePage : IAsyncDisposable
 
     protected async override Task OnInitializedAsync()
     {
-        Wrapper = (await (await JSRuntime.Window()).Navigator()).Geolocation;
-        await UpdateLocation();
+        var authenticationState = await AuthenticationState!;
+
+        if (authenticationState.User.Identity is not null && authenticationState.User.Identity.IsAuthenticated)
+        {
+            Wrapper = (await (await JSRuntime.Window()).Navigator()).Geolocation;
+            await UpdateLocation();
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -27,7 +33,7 @@ public sealed partial class RoutePage : IAsyncDisposable
         {
             Wrapper = (await (await JSRuntime.Window()).Navigator()).Geolocation;
             await UpdateLocation();
-            await JSRuntime!.InvokeVoidAsync("initRoute", Route.Latitude, Route.Longitude);
+            await JSRuntime.InvokeVoidAsync("initRoute", Route.Latitude, Route.Longitude);
             StateHasChanged();
         }
     }
@@ -51,7 +57,7 @@ public sealed partial class RoutePage : IAsyncDisposable
 
                     await UpdateLocation();
                     StateHasChanged();
-                    routeDist = await JSRuntime!.InvokeAsync<double>("calculateRoute", Route.Latitude, Route.Longitude);
+                    routeDist = await JSRuntime.InvokeAsync<double>("calculateRoute", Route.Latitude, Route.Longitude);
                     await Delay(_timeStep);
                 }
 
@@ -64,7 +70,7 @@ public sealed partial class RoutePage : IAsyncDisposable
     {
         await StopWatch();
         StateHasChanged();
-        await JSRuntime!.InvokeVoidAsync("initRoute", Route.Latitude, Route.Longitude);
+        await JSRuntime.InvokeVoidAsync("initRoute", Route.Latitude, Route.Longitude);
     }
 
     private async Task StopWatch()
@@ -98,8 +104,8 @@ public sealed partial class RoutePage : IAsyncDisposable
 
     public async ValueTask DisposeAsync() => await StopWatch();
 
-    [Inject]
-    private IJSRuntime? JSRuntime { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
 
     private IAsyncDisposable? Watcher { get; set; }
 

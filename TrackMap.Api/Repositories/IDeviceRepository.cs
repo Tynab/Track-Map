@@ -16,4 +16,6 @@ public interface IDeviceRepository
     public ValueTask<Device?> Update(Device request);
 
     public ValueTask<Device?> Delete(Device entity);
+
+    public ValueTask<bool> DeactivebyUser(Guid userId);
 }

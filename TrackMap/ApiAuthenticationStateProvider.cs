@@ -30,30 +30,43 @@ public sealed class ApiAuthenticationStateProvider(HttpClient httpClient, ILocal
         return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(tk), "jwt")));
     }
 
-    public void MarkUserAsAuthenticated(string email) => NotifyAuthenticationStateChanged(FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(new[]
+    public void MarkUserAsAuthenticated(string? email)
     {
-        new Claim(Name, email)
-    }, "apiauth")))));
+        if (email.IsWhiteSpaceOrNull())
+        {
+            return;
+        }
+
+        NotifyAuthenticationStateChanged(FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(new[]
+        {
+            new Claim(Name, email)
+        }, "apiauth")))));
+    }
 
     public void MarkUserAsLoggedOut() => NotifyAuthenticationStateChanged(FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()))));
 
-    private static List<Claim> ParseClaimsFromJwt(string jwt)
+    private static List<Claim>? ParseClaimsFromJwt(string? jwt)
     {
+        if (jwt.IsWhiteSpaceOrNull())
+        {
+            return default;
+        }
+
         var rslt = new List<Claim>();
 
-        var keyValPrs = ParseBase64WithoutPadding(jwt.Split('.')[1]).Deserialize<Dictionary<string, object>>();
+        var keyValPrs = ParseBase64WithoutPadding(jwt.Split('.')[1])?.Deserialize<Dictionary<string, object>>();
 
         if (keyValPrs is not null && keyValPrs.TryGetValue(Role, out var rawRoles))
         {
             if (rawRoles is not null)
             {
-                var sRoles = rawRoles.ToString();
+                var sRoles = rawRoles.ToString() ?? string.Empty;
 
-                if (sRoles!.Trim().StartsWith('['))
+                if (sRoles.Trim().StartsWith('['))
                 {
                     var roles = sRoles.Deserialize<string[]>();
 
-                    if (roles?.Length > 0)
+                    if (roles.IsNotEmptyAndNull())
                     {
                         foreach (var role in roles)
                         {
@@ -69,16 +82,18 @@ public sealed class ApiAuthenticationStateProvider(HttpClient httpClient, ILocal
                 _ = keyValPrs.Remove(Role);
             }
 
-            rslt.AddRange(keyValPrs.Select(x => new Claim(x.Key, x.Value.ToString()!)));
+            rslt.AddRange(keyValPrs.Select(x => new Claim(x.Key, x.Value.ToString() ?? string.Empty)));
         }
 
         return rslt;
     }
 
-    private static byte[] ParseBase64WithoutPadding(string base64) => FromBase64String($"{base64}{(base64.Length % 4) switch
-    {
-        2 => "==",
-        3 => "=",
-        _ => string.Empty
-    }}");
+    private static byte[]? ParseBase64WithoutPadding(string? base64) => base64.IsWhiteSpaceOrNull()
+        ? default
+        : FromBase64String($"{base64}{(base64.Length % 4) switch
+        {
+            2 => "==",
+            3 => "=",
+            _ => string.Empty
+        }}");
 }

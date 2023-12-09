@@ -67,7 +67,7 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
 
     [HttpGet("search")]
     [SwaggerOperation(Summary = "Search Devices")]
-    public async ValueTask<IActionResult> Search([FromQuery] DeviceSearchDto dto)
+    public async ValueTask<IActionResult> Search([FromQuery] DeviceSearchDto? dto)
     {
         try
         {
@@ -114,7 +114,7 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
 
     [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Edit Device")]
-    public async ValueTask<IActionResult> Edit(Guid id, DeviceEditRequest request)
+    public async ValueTask<IActionResult> Edit(Guid id, [Required] DeviceEditRequest request)
     {
         try
         {
@@ -152,10 +152,10 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
             ent.Latitude = request.Latitude;
             ent.Longitude = request.Longitude;
             ent.UserId = request.UserId;
-            ent.IsActive = request.IsActive;
             ent.LastLogin = Now;
             ent.UpdatedBy = request.UpdatedBy;
             ent.UpdatedAt = Now;
+            ent.IsActive = request.Status.ToBool();
             ent.User = null;
 
             var rslt = await _repository.Update(ent);
@@ -172,7 +172,7 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
 
     [HttpPatch("{id}")]
     [SwaggerOperation(Summary = "Update Device")]
-    public async ValueTask<IActionResult> Update(Guid id, DeviceUpdateRequest request)
+    public async ValueTask<IActionResult> Update(Guid id, [Required] DeviceUpdateRequest request)
     {
         try
         {
@@ -234,9 +234,9 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
                 ent.UserId = request.UserId.Value;
             }
 
-            if (request.IsActive.HasValue)
+            if (request.Status.HasValue)
             {
-                ent.IsActive = request.IsActive.Value;
+                ent.IsActive = request.Status.Value.ToBool();
             }
 
             ent.LastLogin = Now;
@@ -264,19 +264,42 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
         {
             var ent = await _repository.Get(id);
 
-            return ent is null ? NotFound(new
+            if (ent is null)
             {
-                title = "Not Found",
-                status = 404,
-                errors = new
+                return NotFound(new
                 {
-                    id,
-                }
-            }) : Ok(await _repository.Delete(ent));
+                    title = "Not Found",
+                    status = 404,
+                    errors = new
+                    {
+                        id,
+                    }
+                });
+            }
+
+            var rslt = await _repository.Delete(ent);
+
+            return rslt is null ? Problem() : Ok(_mapper.Map<DeviceResponse>(rslt));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "DeleteDeviceController-Exception: {Id}", id);
+
+            return Problem();
+        }
+    }
+
+    [HttpGet("deactive-by-user")]
+    [SwaggerOperation(Summary = "Deactive Devices by User")]
+    public async ValueTask<IActionResult> DeactivebyUser([Required] Guid userId)
+    {
+        try
+        {
+            return Ok(await _repository.DeactivebyUser(userId));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "DeactivebyUserUserController-Exception: {UserId}", userId);
 
             return Problem();
         }

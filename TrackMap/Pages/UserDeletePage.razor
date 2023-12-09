@@ -1,0 +1,16 @@
+﻿@page "/user-delete/{id}"
+
+@using Microsoft.AspNetCore.Authorization
+@using TrackMap.Components
+@using TrackMap.Services
+
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+@inject IUserService UserService
+
+@attribute [Authorize]
+
+@if (Result is null)
+{
+    <LoadingIndicator />
+}

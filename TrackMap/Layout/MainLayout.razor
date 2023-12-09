@@ -1,6 +1,11 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization;
-@using static Blazored.Toast.Configuration.IconType;
-@using static Blazored.Toast.Configuration.ToastPosition;
+﻿@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.Authorization
+@using static BlazorBootstrap.IconName
+@using static Blazored.Toast.Configuration.IconType
+@using static Blazored.Toast.Configuration.ToastPosition
+
+@inject ILocalStorageService LocalStorageService
+@inject IToastService ToastService
 
 @inherits LayoutComponentBase
 
@@ -13,26 +18,19 @@
                 WarningIcon="fa fa-exclamation"
                 ErrorIcon="fa fa-bug" />
 
-
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    <Sidebar IconName="MapFill"
+             Title="Track Map"
+             DataProvider="SidebarDataProvider" />
 
     <main>
         <div class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
-                    Hello, @context.User.Identity!.Name
+                    Hello, @(context.User.Identity?.Name ?? User?.UserName)
                     <a href="/logout">Logout</a>
                 </Authorized>
-
-                <NotAuthorized>
-                    <a href="/login" class="ms-md-auto">Login</a>
-                </NotAuthorized>
             </AuthorizeView>
-
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
         </div>
 
         <article class="content px-4">@Body</article>

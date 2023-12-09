@@ -68,7 +68,7 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
 
     [HttpGet("search")]
     [SwaggerOperation(Summary = "Search Users")]
-    public async ValueTask<IActionResult> Search([FromQuery] UserSearchDto dto)
+    public async ValueTask<IActionResult> Search([FromQuery] UserSearchDto? dto)
     {
         try
         {
@@ -88,6 +88,19 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
     {
         try
         {
+            if ((await _repository.Search(new UserSearchDto { UserName = request.UserName })).IsNotEmptyAndNull())
+            {
+                return BadRequest(new
+                {
+                    title = $"{nameof(request.UserName)} alraedy exists.",
+                    status = 400,
+                    errors = new
+                    {
+                        request.UserName
+                    }
+                });
+            }
+
             if (await _repository.Get(request.CreatedBy) is null)
             {
                 return NotFound(new
@@ -119,7 +132,7 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
 
     [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Edit User")]
-    public async ValueTask<IActionResult> Edit(Guid id, UserEditRequest request)
+    public async ValueTask<IActionResult> Edit(Guid id, [Required] UserEditRequest request)
     {
         try
         {
@@ -153,9 +166,8 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
 
             ent.FullName = request.FullName;
             ent.Email = request.Email;
-            ent.NormalizedEmail = request.Email.ToUpperInvariant();
+            ent.NormalizedEmail = request.Email.IsWhiteSpaceOrNull() ? string.Empty : request.Email.ToUpperInvariant();
             ent.PhoneNumber = request.PhoneNumber;
-            ent.IsActive = request.IsActive;
             ent.PasswordHash = _passwordHasher.HashPassword(ent, request.Password);
             ent.UpdatedBy = request.UpdatedBy;
             ent.UpdatedAt = Now;
@@ -175,7 +187,7 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
 
     [HttpPatch("{id}")]
     [SwaggerOperation(Summary = "Update User")]
-    public async ValueTask<IActionResult> Update(Guid id, UserUpdateRequest request)
+    public async ValueTask<IActionResult> Update(Guid id, [Required] UserUpdateRequest request)
     {
         try
         {
@@ -223,11 +235,6 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
                 ent.PhoneNumber = request.PhoneNumber;
             }
 
-            if (request.IsActive.HasValue)
-            {
-                ent.IsActive = request.IsActive.Value;
-            }
-
             if (request.Password.IsNotWhiteSpaceAndNull())
             {
                 ent.PasswordHash = _passwordHasher.HashPassword(ent, request.Password);
@@ -257,15 +264,22 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
         {
             var ent = await _repository.Get(id);
 
-            return ent is null ? NotFound(new
+            if (ent is null)
             {
-                title = "Not Found",
-                status = 404,
-                errors = new
+                return NotFound(new
                 {
-                    id,
-                }
-            }) : Ok(await _repository.Delete(ent));
+                    title = "Not Found",
+                    status = 404,
+                    errors = new
+                    {
+                        id,
+                    }
+                });
+            }
+
+            var rslt = await _repository.Delete(ent);
+
+            return rslt is null ? Problem() : Ok(_mapper.Map<UserResponse>(rslt));
         }
         catch (Exception ex)
         {

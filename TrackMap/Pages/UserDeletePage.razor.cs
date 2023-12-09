@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using TrackMap.Common.Responses;
 using YANLib;
 
 namespace TrackMap.Pages;
 
-public sealed partial class DeviceDetailPage
+public sealed partial class UserDeletePage
 {
     protected override async Task OnInitializedAsync()
     {
@@ -13,7 +12,18 @@ public sealed partial class DeviceDetailPage
 
         if (authenticationState.User.Identity is not null && authenticationState.User.Identity.IsAuthenticated && Id.IsNotWhiteSpaceAndNull())
         {
-            Device = await DeviceService.Get(new Guid(Id));
+            Result = await UserService.Delete(new Guid(Id));
+
+            if (Result.Value)
+            {
+                ToastService.ShowSuccess("Delete successful");
+            }
+            else
+            {
+                ToastService.ShowError("An error occurred in progress");
+            }
+
+            NavigationManager.NavigateTo("/users");
         }
     }
 
@@ -23,5 +33,5 @@ public sealed partial class DeviceDetailPage
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; }
 
-    private DeviceResponse? Device { get; set; }
+    private bool? Result { get; set; } = null;
 }

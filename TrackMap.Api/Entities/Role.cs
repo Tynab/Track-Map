@@ -11,6 +11,4 @@ public sealed class Role : IdentityRole<Guid>
     public Guid? UpdatedBy { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
-
-    public bool IsActive { get; set; }
 }

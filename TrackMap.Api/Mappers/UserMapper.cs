@@ -3,6 +3,7 @@ using TrackMap.Api.Entities;
 using TrackMap.Common.Dtos.User;
 using TrackMap.Common.Requests.User;
 using TrackMap.Common.Responses;
+using YANLib;
 using static System.DateTime;
 using static System.Guid;
 
@@ -15,9 +16,8 @@ public sealed class UserMapper : Profile
         _ = CreateMap<UserCreateRequest, User>()
             .ForMember(d => d.Id, o => o.MapFrom(s => NewGuid()))
             .ForMember(d => d.CreatedAt, o => o.MapFrom(s => Now))
-            .ForMember(d => d.IsActive, o => o.MapFrom(s => true))
-            .ForMember(d => d.NormalizedUserName, o => o.MapFrom(s => s.UserName.ToUpperInvariant()))
-            .ForMember(d => d.NormalizedEmail, o => o.MapFrom(s => s.Email.ToUpperInvariant()))
+            .ForMember(d => d.NormalizedUserName, o => o.MapFrom(s => s.UserName.IsWhiteSpaceOrNull() ? string.Empty : s.UserName.ToUpperInvariant()))
+            .ForMember(d => d.NormalizedEmail, o => o.MapFrom(s => s.Email.IsWhiteSpaceOrNull() ? string.Empty : s.Email.ToUpperInvariant()))
             .ForMember(d => d.SecurityStamp, o => o.MapFrom(s => NewGuid()))
             .ForMember(d => d.UpdatedBy, o => o.Ignore())
             .ForMember(d => d.UpdatedAt, o => o.Ignore())

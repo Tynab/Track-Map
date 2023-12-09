@@ -1,6 +1,13 @@
 ﻿@page "/register"
 
+@using TrackMap.Services
 @using YANLib
+
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+@inject IAuthService AuthService
+
+<PageTitle>Register</PageTitle>
 
 @if (ShowErrors)
 {
@@ -18,29 +25,36 @@
         }
     </div>
 }
+
 <div class="d-flex justify-content-center text-center">
     <div class="card w-25">
         <div class="card-body">
-            <h5 class="card-title">Register</h5>
+            <h5>Register</h5>
 
             <EditForm Model="Register" OnValidSubmit="HandleRegister">
                 <DataAnnotationsValidator />
 
-                <div class="mb-3 mt-4">
-                    <InputText id="username" class="form-control text-center" placeholder="Enter username..." @bind-Value="Register.UserName" />
+                <div class="mt-4">
+                    <InputText class="form-control text-center" placeholder="Enter username" @bind-Value="Register.UserName" />
                 </div>
 
-                <div class="mb-3">
-                    <InputText id="password" class="form-control text-center" placeholder="Enter password..." type="password" @bind-Value="Register.Password" />
+                <div class="mt-3">
+                    <InputText class="form-control text-center" placeholder="Enter password" type="password" @bind-Value="Register.Password" />
                 </div>
 
-                <div class="mb-3">
-                    <InputText id="password" class="form-control text-center" placeholder="Confirm password..." type="password" @bind-Value="Register.ConfirmPassword" />
+                <div class="mt-3">
+                    <InputText class="form-control text-center" placeholder="Confirm password" type="password" @bind-Value="Register.ConfirmPassword" />
                 </div>
 
-                <div class="d-flex justify-content-center mt-4">
-                    <div class="w-100">
-                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                <div class="mt-4">
+                    <div class="row">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary w-100">Register</button>
+                        </div>
+
+                        <div class="col">
+                            <a href="/login" class="btn btn-success w-100">Login</a>
+                        </div>
                     </div>
                 </div>
             </EditForm>

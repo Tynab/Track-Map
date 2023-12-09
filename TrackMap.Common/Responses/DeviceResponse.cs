@@ -27,5 +27,7 @@ public sealed record DeviceResponse
 
     public DateTime? UpdatedAt { get; set; }
 
+    public Status Status { get; set; }
+
     public UserDto? User { get; set; }
 }

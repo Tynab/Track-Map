@@ -1,43 +1,46 @@
-﻿@page "/direction"
+﻿@page "/waypoints"
 
 @using Microsoft.AspNetCore.Authorization
 @using TrackMap.Components
+@using TrackMap.Services
 
 @inject IJSRuntime JSRuntime
+@inject IDeviceService DeviceService
 
 @attribute [Authorize]
 
-<PageTitle>Google Map Directions</PageTitle>
+<PageTitle>Google Map Distance Matrix</PageTitle>
 
-@if (Direction is null)
+@if (Waypoint is null)
 {
     <LoadingIndicator />
 }
 else
 {
-    <h1>Google Map Directions</h1>
+    <h1>Google Map Distance Matrix</h1>
 
-    <div class="text-center mt-4">
-        <EditForm Model="Direction" OnValidSubmit="HandleDirection">
+    <div class="row text-center mt-4">
+        <EditForm Model="Waypoint" OnValidSubmit="HandleWaypoints">
             <DataAnnotationsValidator />
 
             <div class="d-flex justify-content-center">
                 <div class="row w-100">
                     <div class="col">
-                        <InputText class="form-control text-center" id="direction-source" @bind-Value="Direction.SourceLocation" />
+                        <InputText class="form-control text-center" id="waypoints-source" @bind-Value="Waypoint.SourceLocation" />
                     </div>
 
                     <div class="col">
-                        <InputText class="form-control text-center" id="direction-destination" @bind-Value="Direction.DestinationLocation" />
+                        <InputText class="form-control text-center" id="waypoints-destination" @bind-Value="Waypoint.DestinationLocation" />
                     </div>
 
                     <div class="mt-3">
                         <button type="submit" class="btn btn-primary">Calculate</button>
                     </div>
                 </div>
+
             </div>
         </EditForm>
     </div>
 
-    <div class="mt-4" id="direction" style="height:600px;width:100%;" />
+    <div class="row mt-4" id="waypoints" style="height:600px;width:100%;" />
 }

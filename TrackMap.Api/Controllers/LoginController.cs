@@ -30,13 +30,13 @@ public sealed class LoginController(ILogger<UserController> logger, IConfigurati
     {
         try
         {
-            return (await _signInManager.PasswordSignInAsync(request.UserName!, request.Password!, false, false)).Succeeded
+            return request.UserName.IsNotWhiteSpaceAndNull() && request.Password.IsNotWhiteSpaceAndNull() && (await _signInManager.PasswordSignInAsync(request.UserName, request.Password, false, false)).Succeeded
                 ? Ok(new LoginResponse
                 {
                     Success = true,
                     Token = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(_configuration["JwtIssuer"], _configuration["JwtAudience"], new[]
                     {
-                        new Claim(Name, request.UserName!)
+                        new Claim(Name, request.UserName)
                     }, expires: Now.AddDays(_configuration["JwtExpiryInDays"].ToInt(1)), signingCredentials: new SigningCredentials(new SymmetricSecurityKey(UTF8.GetBytes(_configuration["JwtSecurityKey"] ?? string.Empty)), HmacSha256)))
                 })
                 : BadRequest(new LoginResponse

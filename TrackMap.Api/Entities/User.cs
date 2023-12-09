@@ -14,7 +14,5 @@ public sealed class User : IdentityUser<Guid>
 
     public DateTime? UpdatedAt { get; set; }
 
-    public bool IsActive { get; set; }
-
     public ICollection<Device>? Devices { get; set; }
 }

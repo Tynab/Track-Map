@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using TrackMap.Common.Enums;
+﻿using TrackMap.Common.Enums;
 
 namespace TrackMap.Common.Requests.Device;
 
@@ -19,6 +18,5 @@ public sealed class DeviceUpdateRequest
 
     public required Guid UpdatedBy { get; set; }
 
-    [DefaultValue(true)]
-    public bool? IsActive { get; set; } = true;
+    public Status? Status { get; set; }
 }

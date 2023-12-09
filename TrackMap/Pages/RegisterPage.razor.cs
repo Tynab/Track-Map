@@ -1,7 +1,5 @@
-﻿using Blazored.Toast.Services;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using TrackMap.Common.Requests;
-using TrackMap.Services;
 
 namespace TrackMap.Pages;
 
@@ -11,7 +9,7 @@ public sealed partial class RegisterPage
     {
         ShowErrors = default;
 
-        var rslt = await AuthService!.Register(Register);
+        var rslt = await AuthService.Register(Register);
 
         if (rslt is null)
         {
@@ -25,8 +23,8 @@ public sealed partial class RegisterPage
         {
             if (rslt.Success)
             {
-                ToastService!.ShowSuccess("Registration successful");
-                NavigationManager?.NavigateTo("/login");
+                ToastService.ShowSuccess("Registration successful");
+                NavigationManager.NavigateTo("/login");
             }
             else
             {
@@ -38,15 +36,6 @@ public sealed partial class RegisterPage
             }
         }
     }
-
-    [Inject]
-    private NavigationManager? NavigationManager { get; set; }
-
-    [Inject]
-    private IToastService? ToastService { get; set; }
-
-    [Inject]
-    private IAuthService? AuthService { get; set; }
 
     private bool ShowErrors { get; set; }
 
