@@ -53,6 +53,28 @@ public sealed class TrackMapDbContextSeed
                 }));
             }
 
+            var roleIds = Range(0, 8).Select(i => NewGuid()).ToArray();
+
+            if (!context.Roles.Any())
+            {
+                await context.Roles.AddRangeAsync(Range(0, 8).Select(i => new Role
+                {
+                    Id = roleIds[i],
+                    Name = i is 0 ? "Admin" : "User",
+                    CreatedBy = userIds[i],
+                    CreatedAt = Now
+                }));
+            }
+
+            if (!context.UserRoles.Any())
+            {
+                await context.UserRoles.AddRangeAsync(Range(0, 8).Select(i => new IdentityUserRole<Guid>
+                {
+                    UserId = userIds[i],
+                    RoleId = roleIds[i]
+                }));
+            }
+
             if (!context.Devices.Any())
             {
                 var lats = new decimal[] { 10.803140162639943m, 10.79034727955936m, 10.772253852070987m, 10.836946301832068m, 10.857962793166275m, 10.822174246205119m, 10.773312964050522m, 10.764001751194433m };
