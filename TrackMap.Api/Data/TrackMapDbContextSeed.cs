@@ -53,25 +53,37 @@ public sealed class TrackMapDbContextSeed
                 }));
             }
 
-            var roleIds = Range(0, 8).Select(i => NewGuid()).ToArray();
+            var roleIds = Range(0, 2).Select(i => NewGuid()).ToArray();
 
             if (!context.Roles.Any())
             {
-                await context.Roles.AddRangeAsync(Range(0, 8).Select(i => new Role
+                await context.Roles.AddRangeAsync(Range(0, 2).Select(i =>
                 {
-                    Id = roleIds[i],
-                    Name = i is 0 ? "Admin" : "User",
-                    CreatedBy = userIds[i],
-                    CreatedAt = Now
+                    var name = i is 0 ? "Admin" : "User";
+
+                    return new Role
+                    {
+                        Id = roleIds[i],
+                        Name = name,
+                        NormalizedName = name.ToUpperInvariant(),
+                        CreatedBy = userIds[i],
+                        CreatedAt = Now
+                    };
                 }));
             }
 
             if (!context.UserRoles.Any())
             {
+                _ = await context.UserRoles.AddAsync(new IdentityUserRole<Guid>
+                {
+                    UserId = userIds[0],
+                    RoleId = roleIds[0]
+                });
+
                 await context.UserRoles.AddRangeAsync(Range(0, 8).Select(i => new IdentityUserRole<Guid>
                 {
                     UserId = userIds[i],
-                    RoleId = roleIds[i]
+                    RoleId = roleIds[1]
                 }));
             }
 

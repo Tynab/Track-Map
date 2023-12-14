@@ -21,6 +21,11 @@ public sealed partial class UsersPage
             await WhenAll(userTask, usersTask);
             User = await userTask;
             Users = await usersTask;
+
+            if (authenticationState.User.IsInRole("Admin"))
+            {
+                IsAdmin = true;
+            }
         }
     }
 
@@ -38,4 +43,6 @@ public sealed partial class UsersPage
     private UserResponse? User { get; set; }
 
     private UserSearchDto UserSearch { get; set; } = new UserSearchDto();
+
+    private bool IsAdmin { get; set; } = false;
 }

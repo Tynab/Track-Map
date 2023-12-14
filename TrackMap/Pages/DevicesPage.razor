@@ -1,5 +1,6 @@
 ﻿@page "/devices"
 
+@using Blazored.LocalStorage
 @using Microsoft.AspNetCore.Authorization
 @using TrackMap.Common.Enums
 @using TrackMap.Components
@@ -9,6 +10,7 @@
 @using static TrackMap.Common.Enums.Status
 
 @inject IConfiguration Configuration
+@inject ILocalStorageService LocalStorageService
 @inject IToastService ToastService
 @inject IUserService UserService
 @inject IDeviceService DeviceService
@@ -17,7 +19,7 @@
 
 <PageTitle>Device list</PageTitle>
 
-@if (Users.IsEmptyOrNull() || Devices.IsEmptyOrNull())
+@if (Users.IsEmptyOrNull() || Devices.IsEmptyOrNull() || User is null)
 {
     <LoadingIndicator />
 }
@@ -50,16 +52,27 @@ else
                     </InputSelect>
                 </div>
 
-                <div class="col">
-                    <InputSelect class="form-control text-center" @bind-Value="DeviceSearch.UserId">
-                        <option>Select an user</option>
+                @if (IsAdmin)
+                {
+                    <div class="col">
+                        <InputSelect class="form-control text-center" @bind-Value="DeviceSearch.UserId">
+                            <option>Select an user</option>
 
-                        @foreach (var user in Users)
-                        {
-                            <option value="@user.Id">@user.FullName</option>
-                        }
-                    </InputSelect>
-                </div>
+                            @foreach (var user in Users)
+                            {
+                                <option value="@user.Id">@user.FullName</option>
+                            }
+                        </InputSelect>
+                    </div>
+                }
+                else
+                {
+                    <div class="col">
+                        <InputSelect class="form-control text-center" disabled="@true" @bind-Value="DeviceSearch.UserId">
+                            <option value="@User.Id">@User.FullName</option>
+                        </InputSelect>
+                    </div>
+                }
 
                 <div class="col">
                     <InputSelect class="form-control text-center" @bind-Value="DeviceSearch.Status">
@@ -96,37 +109,74 @@ else
             @foreach (var device in Devices)
             {
                 <tr class="align-middle">
-                    <td>@device.IpAddress</td>
+                    @if (User.Devices.IsNotEmptyAndNull() && User.Devices.Select(x => x.Id).Contains(device.Id))
+                    {
+                        <td>@device.IpAddress</td>
 
-                    <td>
-                        <DeviceTypeLabel DeviceType="device.DeviceType" />
-                    </td>
+                        <td>
+                            <DeviceTypeLabel DeviceType="device.DeviceType" />
+                        </td>
 
-                    <td>
-                        <DeviceOsLabel DeviceOs="device.DeviceOs" />
-                    </td>
+                        <td>
+                            <DeviceOsLabel DeviceOs="device.DeviceOs" />
+                        </td>
 
-                    <td>@($"{device.Latitude.Round(7)}, {device.Longitude.Round(7)}")</td>
-                    <td>@device.LastLogin.ToString(Configuration["DateFormat"])</td>
+                        <td>@($"{device.Latitude.Round(7)}, {device.Longitude.Round(7)}")</td>
+                        <td>@device.LastLogin.ToString(Configuration["DateFormat"])</td>
 
-                    <td>
-                        <StatusLabel Status="device.Status" />
-                    </td>
+                        <td>
+                            <StatusLabel Status="device.Status" />
+                        </td>
 
-                    <td>
-                        @if (device.Status is Active)
-                        {
-                            <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
-                            <button type="button" class="btn btn-danger" disabled="@true">Delete</button>
-                            <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
-                        }
-                        else
-                        {
-                            <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
-                            <a href="/device-delete/@device.Id" class="btn btn-danger">Delete</a>
-                            <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
-                        }
-                    </td>
+                        <td>
+                            @if (device.Status is Active)
+                            {
+                                <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
+                                <button type="button" class="btn btn-danger" disabled="@true">Delete</button>
+                                <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
+                            }
+                            else
+                            {
+                                <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
+                                <a href="/device-delete/@device.Id" class="btn btn-danger">Delete</a>
+                                <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
+                            }
+                        </td>
+                    }
+                    else if (IsAdmin)
+                    {
+                        <td>@device.IpAddress</td>
+
+                        <td>
+                            <DeviceTypeLabel DeviceType="device.DeviceType" />
+                        </td>
+
+                        <td>
+                            <DeviceOsLabel DeviceOs="device.DeviceOs" />
+                        </td>
+
+                        <td>@($"{device.Latitude.Round(7)}, {device.Longitude.Round(7)}")</td>
+                        <td>@device.LastLogin.ToString(Configuration["DateFormat"])</td>
+
+                        <td>
+                            <StatusLabel Status="device.Status" />
+                        </td>
+
+                        <td>
+                            @if (device.Status is Active)
+                            {
+                                <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
+                                <button type="button" class="btn btn-danger" disabled="@true">Delete</button>
+                                <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
+                            }
+                            else
+                            {
+                                <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
+                                <a href="/device-delete/@device.Id" class="btn btn-danger">Delete</a>
+                                <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
+                            }
+                        </td>
+                    }
                 </tr>
             }
         </tbody>
