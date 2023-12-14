@@ -37,7 +37,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js" integrity="sha512-JPcRR8yFa8mmCsfrw4TNte1ZvF1e3+1SdGMslZvmrzDYxS69J7J49vkFL8u6u8PlPJK+H3voElBtUCzaXj+6ig==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="_content/Blazor.Bootstrap/blazor.bootstrap.js"></script>
     <script src="_content/BrowserInterop/scripts.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASCWY-VWKaVMhu4SKiBvPbRLo9b8KrVAE&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBaPgTVf3GApWpUKA_GNjerSiror-ThLBM&libraries=places"></script>
 
     <script>
         function getUserAgent() {
@@ -449,10 +449,12 @@
             });
         }
 
-        function calculateWaypoints() {
+        function calculateWaypoints(waypts) {
             waypointsService.route({
                 origin: document.getElementById("waypoints-source").value,
                 destination: document.getElementById("waypoints-destination").value,
+                waypoints: waypts,
+                optimizeWaypoints: true,
                 travelMode: google.maps.TravelMode.DRIVING
             }, function (result, status) {
                 if (status == "OK") {
