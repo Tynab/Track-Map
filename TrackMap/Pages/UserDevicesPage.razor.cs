@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using TrackMap.Common.Dtos.Device;
 using TrackMap.Common.Responses;
+using TrackMap.Layout;
 using YANLib;
 
 namespace TrackMap.Pages;
@@ -11,33 +12,50 @@ public sealed partial class UserDevicesPage
 {
     protected override async Task OnInitializedAsync()
     {
-        var authenticationState = await AuthenticationState!;
-
-        if (authenticationState.User.Identity is not null && authenticationState.User.Identity.IsAuthenticated)
+        try
         {
-            Users = await UserService.GetAll().AsTask();
+            var authenticationState = await AuthenticationState!;
 
-            if (Id.IsNotWhiteSpaceAndNull())
+            if (authenticationState.User.Identity is not null && authenticationState.User.Identity.IsAuthenticated)
             {
-                Devices = await DeviceService.Search(new DeviceSearchDto
+                Users = await UserService.GetAll().AsTask();
+
+                if (Id.IsNotWhiteSpaceAndNull())
                 {
-                    UserId = new Guid(Id)
-                });
+                    Devices = await DeviceService.Search(new DeviceSearchDto
+                    {
+                        UserId = new Guid(Id)
+                    });
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
         }
     }
 
     private async Task HandleDeviceSearch(EditContext context)
     {
-        Devices = await DeviceService.Search(DeviceSearch);
-        ToastService.ShowInfo("Seach completed");
+        try
+        {
+            Devices = await DeviceService.Search(DeviceSearch);
+            ToastService.ShowInfo("Seach completed");
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
     }
 
-    [Parameter]
-    public string? Id { get; set; }
+    [CascadingParameter]
+    private Error? Error { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    [Parameter]
+    public string? Id { get; set; }
 
     private List<DeviceResponse>? Devices { get; set; }
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using TrackMap.Common.Dtos.Device;
 using TrackMap.Common.Responses;
+using TrackMap.Layout;
 using YANLib;
 
 namespace TrackMap.Pages;
@@ -11,42 +12,59 @@ public sealed partial class UserDetailPage
 {
     protected override async Task OnInitializedAsync()
     {
-        var authenticationState = await AuthenticationState!;
-
-        if (authenticationState.User.Identity is not null && authenticationState.User.Identity.IsAuthenticated && Id.IsNotWhiteSpaceAndNull())
+        try
         {
-            User = await UserService.Get(new Guid(Id));
+            var authenticationState = await AuthenticationState!;
 
-            Devices = User?.Devices?.Select(x => new DeviceResponse
+            if (authenticationState.User.Identity is not null && authenticationState.User.Identity.IsAuthenticated && Id.IsNotWhiteSpaceAndNull())
             {
-                Id = x.Id,
-                DeviceType = x.DeviceType,
-                DeviceOs = x.DeviceOs,
-                IpAddress = x.IpAddress,
-                Latitude = x.Latitude,
-                Longitude = x.Longitude,
-                LastLogin = x.LastLogin,
-                CreatedBy = x.CreatedBy,
-                CreatedAt = x.CreatedAt,
-                UpdatedBy = x.UpdatedBy,
-                UpdatedAt = x.UpdatedAt,
-                Status = x.Status
-            }).ToList();
+                User = await UserService.Get(new Guid(Id));
+
+                Devices = User?.Devices?.Select(x => new DeviceResponse
+                {
+                    Id = x.Id,
+                    DeviceType = x.DeviceType,
+                    DeviceOs = x.DeviceOs,
+                    IpAddress = x.IpAddress,
+                    Latitude = x.Latitude,
+                    Longitude = x.Longitude,
+                    LastLogin = x.LastLogin,
+                    CreatedBy = x.CreatedBy,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedBy = x.UpdatedBy,
+                    UpdatedAt = x.UpdatedAt,
+                    Status = x.Status
+                }).ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
         }
     }
 
     private async Task HandleDeviceSearch(EditContext context)
     {
-        DeviceSearch.UserId = User?.Id;
-        Devices = await DeviceService.Search(DeviceSearch);
-        ToastService.ShowInfo("Seach completed");
+        try
+        {
+            DeviceSearch.UserId = User?.Id;
+            Devices = await DeviceService.Search(DeviceSearch);
+            ToastService.ShowInfo("Seach completed");
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
     }
 
-    [Parameter]
-    public string? Id { get; set; }
+    [CascadingParameter]
+    private Error? Error { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    [Parameter]
+    public string? Id { get; set; }
 
     private UserResponse? User { get; set; }
 

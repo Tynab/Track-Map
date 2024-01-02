@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using TrackMap.Common.Dtos;
+using TrackMap.Layout;
 using static System.Threading.Tasks.Task;
 
 namespace TrackMap.Pages;
@@ -22,79 +23,127 @@ public sealed partial class TestPage : IAsyncDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        var authenticationState = await AuthenticationState!;
-
-        if (authenticationState.User.Identity is not null && authenticationState.User.Identity.IsAuthenticated)
+        try
         {
-            Wrapper = (await (await JSRuntime.Window()).Navigator()).Geolocation;
-            Route.Latitude = _latSrc;
-            Route.Longitude = _lngSrc;
+            var authenticationState = await AuthenticationState!;
+
+            if (authenticationState.User.Identity is not null && authenticationState.User.Identity.IsAuthenticated)
+            {
+                Wrapper = (await (await JSRuntime.Window()).Navigator()).Geolocation;
+                Route.Latitude = _latSrc;
+                Route.Longitude = _lngSrc;
+            }
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
         }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        try
         {
-            await JSRuntime.InvokeVoidAsync("initRoute", _latSrc, _lngSrc);
-            StateHasChanged();
+            if (firstRender)
+            {
+                await JSRuntime.InvokeVoidAsync("initRoute", _latSrc, _lngSrc);
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
         }
     }
 
     private async Task HandleWatch()
     {
-        if (Watcher is null && !IsWatching)
+        try
         {
-            Watcher = await Wrapper!.WatchPosition(async (p) =>
+            if (Watcher is null && !IsWatching)
             {
-                IsWatching = true;
-
-                while (Route.Latitude < _latLastStep && Route.Longitude > _lngLastStep)
+                Watcher = await Wrapper!.WatchPosition(async (p) =>
                 {
-                    if (Watcher is null || !IsWatching)
+                    IsWatching = true;
+
+                    while (Route.Latitude < _latLastStep && Route.Longitude > _lngLastStep)
                     {
-                        break;
+                        if (Watcher is null || !IsWatching)
+                        {
+                            break;
+                        }
+
+                        if (Route.Latitude < _latLastStep)
+                        {
+                            Route.Latitude += _latStep;
+                        }
+
+                        if (Route.Longitude > _lngLastStep)
+                        {
+                            Route.Longitude -= _lngStep;
+                        }
+
+                        StateHasChanged();
+                        await JSRuntime.InvokeVoidAsync("calculateRoute", Route.Latitude, Route.Longitude);
+                        await Delay(_timeStep);
                     }
 
-                    if (Route.Latitude < _latLastStep)
-                    {
-                        Route.Latitude += _latStep;
-                    }
-
-                    if (Route.Longitude > _lngLastStep)
-                    {
-                        Route.Longitude -= _lngStep;
-                    }
-
-                    StateHasChanged();
-                    await JSRuntime.InvokeVoidAsync("calculateRoute", Route.Latitude, Route.Longitude);
-                    await Delay(_timeStep);
-                }
-
-                await HandleReset();
-            });
+                    await HandleReset();
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
         }
     }
 
     private async Task HandleReset()
     {
-        await StopWatch();
-        StateHasChanged();
-        await JSRuntime.InvokeVoidAsync("initRoute", Route.Latitude, Route.Longitude);
+        try
+        {
+            await StopWatch();
+            StateHasChanged();
+            await JSRuntime.InvokeVoidAsync("initRoute", Route.Latitude, Route.Longitude);
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
     }
 
     private async Task StopWatch()
     {
-        IsWatching = false;
-
-        if (Watcher is not null)
+        try
         {
-            await Watcher.DisposeAsync();
-            Watcher = default;
+            IsWatching = false;
+
+            if (Watcher is not null)
+            {
+                await Watcher.DisposeAsync();
+                Watcher = default;
+            }
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
         }
     }
 
-    public async ValueTask DisposeAsync() => await StopWatch();
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await StopWatch();
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
+    }
+
+    [CascadingParameter]
+    private Error? Error { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; }

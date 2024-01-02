@@ -132,13 +132,13 @@ else
                             @if (device.Status is Active)
                             {
                                 <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
-                                <button type="button" class="btn btn-danger" disabled="@true">Delete</button>
+                                <button class="btn btn-danger" disabled="@true">Delete</button>
                                 <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
                             }
                             else
                             {
                                 <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
-                                <a href="/device-delete/@device.Id" class="btn btn-danger">Delete</a>
+                                <button class="btn btn-danger" @onclick="() => OnDeleteDevice(device.Id)">Delete</button>
                                 <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
                             }
                         </td>
@@ -166,13 +166,13 @@ else
                             @if (device.Status is Active)
                             {
                                 <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
-                                <button type="button" class="btn btn-danger" disabled="@true">Delete</button>
+                                <button class="btn btn-danger" disabled="@true">Delete</button>
                                 <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
                             }
                             else
                             {
                                 <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
-                                <a href="/device-delete/@device.Id" class="btn btn-danger">Delete</a>
+                                <button class="btn btn-danger" @onclick="() => OnDeleteDevice(device.Id)">Delete</button>
                                 <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
                             }
                         </td>
@@ -181,4 +181,6 @@ else
             }
         </tbody>
     </table>
+
+    <Confirmation ConfirmationMessage="Are you sure to delete?" ConfirmationTitle="Delete Task" @ref="DeleteConfirmation" ConfirmationChanged="OnConfirmDeleteDevice" />
 }

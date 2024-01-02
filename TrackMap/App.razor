@@ -1,22 +1,24 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using TrackMap.Components
 
-<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-            <NotAuthorized>
-                <RedirectToLogin />
-            </NotAuthorized>
-        </AuthorizeRouteView>
+<Error>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <RedirectToLogin />
+                </NotAuthorized>
+            </AuthorizeRouteView>
 
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
 
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
 
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</Error>
