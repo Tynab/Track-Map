@@ -86,7 +86,7 @@ else
 
                         <td>
                             <a href="/user-detail/@user.Id" class="btn btn-secondary">Detail</a>
-                            <a href="/user-delete/@user.Id" class="btn btn-danger">Delete</a>
+                            <button class="btn btn-danger" @onclick="() => OnDeleteUser(user.Id)">Delete</button>
                             <a href="/user-devices/@user.Id" class="btn btn-warning">Devices</a>
                         </td>
                     }
@@ -94,4 +94,6 @@ else
             }
         </tbody>
     </table>
+
+    <Confirmation ConfirmationMessage="Are you sure to delete it?" ConfirmationTitle="Delete User" @ref="DeleteConfirmation" ConfirmationChanged="OnConfirmDeleteUser" />
 }

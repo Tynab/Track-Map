@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using TrackMap.Common.Dtos.User;
 using TrackMap.Common.Responses;
+using TrackMap.Components;
 using TrackMap.Layout;
 using static System.Threading.Tasks.Task;
 
@@ -10,6 +11,8 @@ namespace TrackMap.Pages;
 
 public sealed partial class UsersPage
 {
+    private Guid _deleteId;
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -50,6 +53,35 @@ public sealed partial class UsersPage
         }
     }
 
+    public void OnDeleteUser(Guid id)
+    {
+        try
+        {
+            _deleteId = id;
+            DeleteConfirmation?.Show();
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
+    }
+
+    public async Task OnConfirmDeleteUser(bool isConfirmed)
+    {
+        try
+        {
+            if (isConfirmed && await UserService.Delete(_deleteId))
+            {
+                ToastService.ShowSuccess("Delete successful");
+                Users = await UserService.Search(UserSearch);
+            }
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
+    }
+
     [CascadingParameter]
     private Error? Error { get; set; }
 
@@ -57,6 +89,8 @@ public sealed partial class UsersPage
     private Task<AuthenticationState>? AuthenticationState { get; set; }
 
     private List<UserResponse>? Users { get; set; }
+
+    private Confirmation? DeleteConfirmation { get; set; }
 
     private UserResponse? User { get; set; }
 

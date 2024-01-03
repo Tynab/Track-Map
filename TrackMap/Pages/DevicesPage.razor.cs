@@ -11,6 +11,8 @@ namespace TrackMap.Pages;
 
 public sealed partial class DevicesPage
 {
+    private Guid _deleteId;
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -53,11 +55,11 @@ public sealed partial class DevicesPage
         }
     }
 
-    public void OnDeleteDevice(Guid deleteId)
+    public void OnDeleteDevice(Guid id)
     {
         try
         {
-            DeleteId = deleteId;
+            _deleteId = id;
             DeleteConfirmation?.Show();
         }
         catch (Exception ex)
@@ -66,16 +68,15 @@ public sealed partial class DevicesPage
         }
     }
 
-    public async Task OnConfirmDeleteDevice(bool deleteConfirmed)
+    public async Task OnConfirmDeleteDevice(bool isConfirmed)
     {
         try
         {
-            if (deleteConfirmed && await DeviceService.Delete(DeleteId))
+            if (isConfirmed && await DeviceService.Delete(_deleteId))
             {
                 ToastService.ShowSuccess("Delete successful");
+                Devices = await DeviceService.Search(DeviceSearch);
             }
-
-            Devices = await DeviceService.Search(DeviceSearch);
         }
         catch (Exception ex)
         {
@@ -98,8 +99,6 @@ public sealed partial class DevicesPage
     private UserResponse? User { get; set; }
 
     private DeviceSearchDto DeviceSearch { get; set; } = new DeviceSearchDto();
-
-    private Guid DeleteId { get; set; }
 
     private bool IsAdmin { get; set; } = false;
 }

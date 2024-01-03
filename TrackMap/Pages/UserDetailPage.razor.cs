@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using TrackMap.Common.Dtos.Device;
 using TrackMap.Common.Responses;
+using TrackMap.Components;
 using TrackMap.Layout;
 using YANLib;
 
@@ -10,6 +11,8 @@ namespace TrackMap.Pages;
 
 public sealed partial class UserDetailPage
 {
+    private Guid _deleteId;
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -57,6 +60,36 @@ public sealed partial class UserDetailPage
         }
     }
 
+    public void OnDeleteDevice(Guid id)
+    {
+        try
+        {
+            _deleteId = id;
+            DeleteConfirmation?.Show();
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
+    }
+
+    public async Task OnConfirmDeleteDevice(bool isComfirmed)
+    {
+        try
+        {
+            if (isComfirmed && await DeviceService.Delete(_deleteId))
+            {
+                ToastService.ShowSuccess("Delete successful");
+                DeviceSearch.UserId = User?.Id;
+                Devices = await DeviceService.Search(DeviceSearch);
+            }
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
+    }
+
     [CascadingParameter]
     private Error? Error { get; set; }
 
@@ -66,9 +99,11 @@ public sealed partial class UserDetailPage
     [Parameter]
     public string? Id { get; set; }
 
-    private UserResponse? User { get; set; }
-
     private List<DeviceResponse>? Devices { get; set; }
+
+    private Confirmation? DeleteConfirmation { get; set; }
+
+    private UserResponse? User { get; set; }
 
     private DeviceSearchDto DeviceSearch { get; set; } = new DeviceSearchDto();
 }
