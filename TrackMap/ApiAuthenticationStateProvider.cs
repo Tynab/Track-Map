@@ -30,17 +30,14 @@ public sealed class ApiAuthenticationStateProvider(HttpClient httpClient, ILocal
         return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(tk), "jwt")));
     }
 
-    public void MarkUserAsAuthenticated(string? email)
+    public void MarkUserAsAuthenticated(string? token)
     {
-        if (email.IsWhiteSpaceOrNull())
+        if (token.IsWhiteSpaceOrNull())
         {
             return;
         }
 
-        NotifyAuthenticationStateChanged(FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(new[]
-        {
-            new Claim(Name, email)
-        }, "apiauth")))));
+        NotifyAuthenticationStateChanged(FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt")))));
     }
 
     public void MarkUserAsLoggedOut() => NotifyAuthenticationStateChanged(FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()))));

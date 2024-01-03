@@ -51,7 +51,7 @@ public sealed class AuthService(ILogger<AuthService> logger, HttpClient httpClie
             if (res.IsSuccessStatusCode && rslt is not null)
             {
                 await _localStorageService.SetItemAsync("authToken", rslt.Token);
-                ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(request.UserName);
+                ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(rslt.Token);
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", rslt.Token);
             }
 
