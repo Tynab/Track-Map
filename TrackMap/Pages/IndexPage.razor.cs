@@ -49,7 +49,7 @@ public sealed partial class IndexPage
                 await WhenAll(devsTask, agtTask, posTask, deactiveTask);
 
                 var os = (await agtTask).CheckOs();
-                var existDev = (await devsTask)?.FirstOrDefault();
+                var existDev = (await devsTask)?.Items?.FirstOrDefault();
 
                 _ = existDev is null
                     ? await DeviceService.Create(new DeviceCreateRequest
@@ -98,7 +98,7 @@ public sealed partial class IndexPage
         }
     }
 
-    public async Task GetCurrentPosition()
+    private async Task GetCurrentPosition()
     {
         try
         {
@@ -116,10 +116,10 @@ public sealed partial class IndexPage
     }
 
     [CascadingParameter]
-    private Error? Error { get; set; }
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
 
     [CascadingParameter]
-    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    private Error? Error { get; set; }
 
     private WindowNavigatorGeolocation? Geolocation { get; set; }
 

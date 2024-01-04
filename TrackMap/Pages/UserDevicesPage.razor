@@ -6,6 +6,7 @@
 @using TrackMap.Services
 @using YANLib
 @using static System.Enum
+@using static TrackMap.Common.Enums.Status
 
 @inject IConfiguration Configuration
 @inject IToastService ToastService
@@ -116,13 +117,33 @@ else
                             <StatusLabel Status="device.Status" />
                         </td>
 
-                        <td>
+                        @* <td>
                             <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
                             <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
+                        </td> *@
+                        <td>
+                            @if (device.Status is Active)
+                            {
+                                <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
+                                <button class="btn btn-danger" disabled="@true">Delete</button>
+                                <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
+                            }
+                            else
+                            {
+                                <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
+                                <button class="btn btn-danger" @onclick="() => OnDeleteDevice(device.Id)">Delete</button>
+                                <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
+                            }
                         </td>
                     </tr>
                 }
             }
         </tbody>
+
+        <tfoot>
+            <Paginnation MetaData="MetaData" Spread="2" SelectedPage="SelectedPage"></Paginnation>
+        </tfoot>
     </table>
+
+    <Confirmation ConfirmationMessage="Are you sure to delete it?" ConfirmationTitle="Delete Task" @ref="DeleteConfirmation" ConfirmationChanged="OnConfirmDeleteDevice" />
 }

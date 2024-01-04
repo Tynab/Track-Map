@@ -33,7 +33,7 @@ public sealed partial class LoginPage
                         await LocalStorageService.SetItemAsync("profile", (await UserService.Search(new UserSearchDto
                         {
                             UserName = authenticationState.User.Identity.Name
-                        }))?.FirstOrDefault());
+                        }))?.Items?.FirstOrDefault());
                     }
 
                     ToastService.ShowSuccess("Login successful");
@@ -53,14 +53,14 @@ public sealed partial class LoginPage
     }
 
     [CascadingParameter]
-    private Error? Error { get; set; }
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
 
     [CascadingParameter]
-    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    private Error? Error { get; set; }
 
     private bool ShowErrors { get; set; }
 
-    private string ErrorMessage { get; set; } = string.Empty;
-
     private LoginRequest Login { get; set; } = new LoginRequest();
+
+    private string ErrorMessage { get; set; } = string.Empty;
 }

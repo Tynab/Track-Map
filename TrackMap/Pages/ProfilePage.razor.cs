@@ -50,10 +50,10 @@ public sealed partial class ProfilePage
     }
 
     [CascadingParameter]
-    private Error? Error { get; set; }
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
 
     [CascadingParameter]
-    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    private Error? Error { get; set; }
 
     private UserResponse? User { get; set; }
 

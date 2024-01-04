@@ -8,6 +8,7 @@ using TrackMap.Api.Repositories;
 using TrackMap.Common.Dtos.User;
 using TrackMap.Common.Requests.User;
 using TrackMap.Common.Responses;
+using TrackMap.Common.SeedWork;
 using YANLib;
 using static System.DateTime;
 
@@ -68,11 +69,11 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
 
     [HttpGet("search")]
     [SwaggerOperation(Summary = "Search Users")]
-    public async ValueTask<IActionResult> Search([FromQuery] UserSearchDto? dto)
+    public async ValueTask<IActionResult> Search([FromQuery] UserSearchDto dto)
     {
         try
         {
-            return Ok(_mapper.Map<IEnumerable<UserResponse>>(dto is null ? await _repository.GetAll() : await _repository.Search(dto)));
+            return Ok(_mapper.Map<PagedList<UserResponse>>(await _repository.Search(dto)));
         }
         catch (Exception ex)
         {
@@ -88,7 +89,7 @@ public sealed class UserController(ILogger<UserController> logger, IMapper mappe
     {
         try
         {
-            if ((await _repository.Search(new UserSearchDto { UserName = request.UserName })).IsNotEmptyAndNull())
+            if ((await _repository.Search(new UserSearchDto { UserName = request.UserName }))?.Items?.Count > 0)
             {
                 return BadRequest(new
                 {

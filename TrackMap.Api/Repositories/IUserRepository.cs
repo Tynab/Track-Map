@@ -1,5 +1,6 @@
 ﻿using TrackMap.Api.Entities;
 using TrackMap.Common.Dtos.User;
+using TrackMap.Common.SeedWork;
 
 namespace TrackMap.Api.Repositories;
 
@@ -9,7 +10,7 @@ public interface IUserRepository
 
     public ValueTask<User?> Get(Guid id);
 
-    public ValueTask<IEnumerable<User>> Search(UserSearchDto dto);
+    public ValueTask<PagedList<User>> Search(UserSearchDto dto);
 
     public ValueTask<User?> Create(User entity);
 

@@ -60,7 +60,7 @@ public sealed partial class DirectionPage
         }
     }
 
-    public async Task GetCurrentPosition()
+    private async Task GetCurrentPosition()
     {
         try
         {
@@ -78,10 +78,10 @@ public sealed partial class DirectionPage
     }
 
     [CascadingParameter]
-    private Error? Error { get; set; }
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
 
     [CascadingParameter]
-    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    private Error? Error { get; set; }
 
     private WindowNavigatorGeolocation? Geolocation { get; set; }
 

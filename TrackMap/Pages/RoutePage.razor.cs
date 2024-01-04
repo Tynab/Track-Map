@@ -168,10 +168,10 @@ public sealed partial class RoutePage : IAsyncDisposable
     }
 
     [CascadingParameter]
-    private Error? Error { get; set; }
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
 
     [CascadingParameter]
-    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    private Error? Error { get; set; }
 
     private IAsyncDisposable? Watcher { get; set; }
 

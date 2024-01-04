@@ -2,7 +2,9 @@
 using TrackMap.Common.Dtos.User;
 using TrackMap.Common.Requests.User;
 using TrackMap.Common.Responses;
+using TrackMap.Common.SeedWork;
 using YANLib;
+using static Microsoft.AspNetCore.WebUtilities.QueryHelpers;
 using static System.Guid;
 using static System.Text.Encoding;
 
@@ -41,21 +43,48 @@ public sealed class UserService(ILogger<UserService> logger, HttpClient httpClie
         }
     }
 
-    public async ValueTask<List<UserResponse>?> Search(UserSearchDto? dto)
+    public async ValueTask<PagedList<UserResponse>?> Search(UserSearchDto? dto)
     {
         try
         {
-            return dto is null
-                ? default
-                : await _httpClient.GetFromJsonAsync<List<UserResponse>>(
-                    $"api/users/search" +
-                    $"?{nameof(dto.FullName).ToLowerInvariant()}={dto.FullName}" +
-                    $"&{nameof(dto.Email).ToLowerInvariant()}={dto.Email}" +
-                    $"&{nameof(dto.PhoneNumber).ToLowerInvariant()}={dto.PhoneNumber}" +
-                    $"&{nameof(dto.UserName).ToLowerInvariant()}={dto.UserName}" +
-                    $"&{nameof(dto.CreatedBy).ToLowerInvariant()}={dto.CreatedBy}" +
-                    $"&{nameof(dto.UpdatedBy).ToLowerInvariant()}={dto.UpdatedBy}"
-                );
+            dto ??= new UserSearchDto();
+
+            var qryParam = new Dictionary<string, string>
+            {
+                [nameof(dto.PageNumber).ToLowerInvariant()] = dto.PageNumber.ToString()
+            };
+
+            if (dto.FullName.IsNotWhiteSpaceAndNull())
+            {
+                qryParam.Add(nameof(dto.FullName).ToLowerInvariant(), dto.FullName);
+            }
+
+            if (dto.Email.IsNotWhiteSpaceAndNull())
+            {
+                qryParam.Add(nameof(dto.Email).ToLowerInvariant(), dto.Email);
+            }
+
+            if (dto.PhoneNumber.IsNotWhiteSpaceAndNull())
+            {
+                qryParam.Add(nameof(dto.PhoneNumber).ToLowerInvariant(), dto.PhoneNumber);
+            }
+
+            if (dto.UserName.IsNotWhiteSpaceAndNull())
+            {
+                qryParam.Add(nameof(dto.UserName).ToLowerInvariant(), dto.UserName);
+            }
+
+            if (dto.CreatedBy.HasValue)
+            {
+                qryParam.Add(nameof(dto.CreatedBy).ToLowerInvariant(), dto.CreatedBy.Value.ToString());
+            }
+
+            if (dto.UpdatedBy.HasValue)
+            {
+                qryParam.Add(nameof(dto.UpdatedBy).ToLowerInvariant(), dto.UpdatedBy.Value.ToString());
+            }
+
+            return await _httpClient.GetFromJsonAsync<PagedList<UserResponse>>(AddQueryString("api/users/search", qryParam!));
         }
         catch (Exception ex)
         {

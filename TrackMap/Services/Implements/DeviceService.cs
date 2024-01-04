@@ -2,7 +2,9 @@
 using TrackMap.Common.Dtos.Device;
 using TrackMap.Common.Requests.Device;
 using TrackMap.Common.Responses;
+using TrackMap.Common.SeedWork;
 using YANLib;
+using static Microsoft.AspNetCore.WebUtilities.QueryHelpers;
 using static System.Guid;
 using static System.Text.Encoding;
 
@@ -41,24 +43,63 @@ public sealed class DeviceService(ILogger<DeviceService> logger, HttpClient http
         }
     }
 
-    public async ValueTask<List<DeviceResponse>?> Search(DeviceSearchDto? dto)
+    public async ValueTask<PagedList<DeviceResponse>?> Search(DeviceSearchDto? dto)
     {
         try
         {
-            return dto is null
-                ? default
-                : await _httpClient.GetFromJsonAsync<List<DeviceResponse>>(
-                    $"api/devices/search" +
-                    $"?{nameof(dto.DeviceType).ToLowerInvariant()}={dto.DeviceType}" +
-                    $"&{nameof(dto.DeviceOs).ToLowerInvariant()}={dto.DeviceOs}" +
-                    $"&{nameof(dto.IpAddress).ToLowerInvariant()}={dto.IpAddress}" +
-                    $"&{nameof(dto.Latitude).ToLowerInvariant()}={dto.Latitude}" +
-                    $"&{nameof(dto.Longitude).ToLowerInvariant()}={dto.Longitude}" +
-                    $"&{nameof(dto.UserId).ToLowerInvariant()}={dto.UserId}" +
-                    $"&{nameof(dto.CreatedBy).ToLowerInvariant()}={dto.CreatedBy}" +
-                    $"&{nameof(dto.UpdatedBy).ToLowerInvariant()}={dto.UpdatedBy}" +
-                    $"&{nameof(dto.Status).ToLowerInvariant()}={dto.Status}"
-                );
+            dto ??= new DeviceSearchDto();
+
+            var qryParam = new Dictionary<string, string>
+            {
+                [nameof(dto.PageNumber).ToLowerInvariant()] = dto.PageNumber.ToString()
+            };
+
+            if (dto.DeviceType.HasValue)
+            {
+                qryParam.Add(nameof(dto.DeviceType).ToLowerInvariant(), dto.DeviceType.Value.ToString());
+            }
+
+            if (dto.DeviceOs.HasValue)
+            {
+                qryParam.Add(nameof(dto.DeviceOs).ToLowerInvariant(), dto.DeviceOs.Value.ToString());
+            }
+
+            if (dto.IpAddress.IsNotWhiteSpaceAndNull())
+            {
+                qryParam.Add(nameof(dto.IpAddress).ToLowerInvariant(), dto.IpAddress);
+            }
+
+            if (dto.Latitude.HasValue)
+            {
+                qryParam.Add(nameof(dto.Latitude).ToLowerInvariant(), dto.Latitude.Value.ToString());
+            }
+
+            if (dto.Longitude.HasValue)
+            {
+                qryParam.Add(nameof(dto.Longitude).ToLowerInvariant(), dto.Longitude.Value.ToString());
+            }
+
+            if (dto.UserId.HasValue)
+            {
+                qryParam.Add(nameof(dto.UserId).ToLowerInvariant(), dto.UserId.Value.ToString());
+            }
+
+            if (dto.CreatedBy.HasValue)
+            {
+                qryParam.Add(nameof(dto.CreatedBy).ToLowerInvariant(), dto.CreatedBy.Value.ToString());
+            }
+
+            if (dto.UpdatedBy.HasValue)
+            {
+                qryParam.Add(nameof(dto.UpdatedBy).ToLowerInvariant(), dto.UpdatedBy.Value.ToString());
+            }
+
+            if (dto.Status.HasValue)
+            {
+                qryParam.Add(nameof(dto.Status).ToLowerInvariant(), dto.Status.Value.ToString());
+            }
+
+            return await _httpClient.GetFromJsonAsync<PagedList<DeviceResponse>>(AddQueryString("api/devices/search", qryParam!));
         }
         catch (Exception ex)
         {

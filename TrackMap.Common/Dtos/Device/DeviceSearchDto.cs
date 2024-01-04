@@ -1,8 +1,9 @@
 ﻿using TrackMap.Common.Enums;
+using TrackMap.Common.SeedWork;
 
 namespace TrackMap.Common.Dtos.Device;
 
-public sealed class DeviceSearchDto
+public sealed class DeviceSearchDto : PagingParameters
 {
     public DeviceType? DeviceType { get; set; }
 

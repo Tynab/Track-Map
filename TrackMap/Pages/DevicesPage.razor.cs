@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using TrackMap.Common.Dtos.Device;
 using TrackMap.Common.Responses;
+using TrackMap.Common.SeedWork;
 using TrackMap.Components;
 using TrackMap.Layout;
 using static System.Threading.Tasks.Task;
@@ -23,12 +24,10 @@ public sealed partial class DevicesPage
             {
                 var userTask = LocalStorageService.GetItemAsync<UserResponse>("profile").AsTask();
                 var usersTask = UserService.GetAll().AsTask();
-                var devsTask = DeviceService.GetAll().AsTask();
 
-                await WhenAll(userTask, usersTask, devsTask);
+                await WhenAll(userTask, usersTask, GetDevices().AsTask());
                 User = await userTask;
                 Users = await usersTask;
-                Devices = await devsTask;
 
                 if (authenticationState.User.IsInRole("Admin"))
                 {
@@ -46,8 +45,10 @@ public sealed partial class DevicesPage
     {
         try
         {
-            Devices = await DeviceService.Search(DeviceSearch);
-            ToastService.ShowInfo("Seach completed");
+            if (await GetDevices())
+            {
+                ToastService.ShowInfo("Seach completed");
+            }
         }
         catch (Exception ex)
         {
@@ -55,7 +56,7 @@ public sealed partial class DevicesPage
         }
     }
 
-    public void OnDeleteDevice(Guid id)
+    private void OnDeleteDevice(Guid id)
     {
         try
         {
@@ -68,14 +69,16 @@ public sealed partial class DevicesPage
         }
     }
 
-    public async Task OnConfirmDeleteDevice(bool isConfirmed)
+    private async Task OnConfirmDeleteDevice(bool isConfirmed)
     {
         try
         {
             if (isConfirmed && await DeviceService.Delete(_deleteId))
             {
-                ToastService.ShowSuccess("Delete successful");
-                Devices = await DeviceService.Search(DeviceSearch);
+                if (await GetDevices())
+                {
+                    ToastService.ShowSuccess("Delete successful");
+                }
             }
         }
         catch (Exception ex)
@@ -84,11 +87,46 @@ public sealed partial class DevicesPage
         }
     }
 
-    [CascadingParameter]
-    private Error? Error { get; set; }
+    private async Task SelectedPage(int page)
+    {
+        try
+        {
+            DeviceSearch.PageNumber = page;
+            _ = await GetDevices();
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
+    }
+
+    private async ValueTask<bool> GetDevices()
+    {
+        try
+        {
+            var pagingRes = await DeviceService.Search(DeviceSearch);
+
+            if (pagingRes is not null && pagingRes.MetaData is not null)
+            {
+                Devices = pagingRes.Items;
+                MetaData = pagingRes.MetaData;
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+
+            return false;
+        }
+    }
 
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    [CascadingParameter]
+    private Error? Error { get; set; }
 
     private List<DeviceResponse>? Devices { get; set; }
 
@@ -99,6 +137,8 @@ public sealed partial class DevicesPage
     private UserResponse? User { get; set; }
 
     private DeviceSearchDto DeviceSearch { get; set; } = new DeviceSearchDto();
+
+    private MetaData MetaData { get; set; } = new MetaData();
 
     private bool IsAdmin { get; set; } = false;
 }

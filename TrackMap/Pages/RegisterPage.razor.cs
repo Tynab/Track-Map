@@ -19,7 +19,7 @@ public sealed partial class RegisterPage
                 ShowErrors = true;
                 Errors = new string[]
                 {
-                "Not responding"
+                    "Not responding"
                 };
             }
             else
@@ -34,7 +34,7 @@ public sealed partial class RegisterPage
                     ShowErrors = true;
                     Errors = rslt.Errors ?? new string[]
                     {
-                    "Not responding"
+                        "Not responding"
                     };
                 }
             }
@@ -48,9 +48,9 @@ public sealed partial class RegisterPage
     [CascadingParameter]
     private Error? Error { get; set; }
 
-    private bool ShowErrors { get; set; }
+    private IEnumerable<string>? Errors { get; set; }
 
-    private IEnumerable<string>? Errors { get; set; } = default;
+    private bool ShowErrors { get; set; }
 
     private RegisterRequest Register { get; set; } = new RegisterRequest();
 }

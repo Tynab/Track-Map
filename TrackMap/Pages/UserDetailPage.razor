@@ -150,6 +150,10 @@ else
                 }
             }
         </tbody>
+
+        <tfoot>
+            <Paginnation MetaData="MetaData" Spread="2" SelectedPage="SelectedPage"></Paginnation>
+        </tfoot>
     </table>
 
     <Confirmation ConfirmationMessage="Are you sure to delete it?" ConfirmationTitle="Delete Task" @ref="DeleteConfirmation" ConfirmationChanged="OnConfirmDeleteDevice" />

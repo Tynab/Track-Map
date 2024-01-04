@@ -3,6 +3,7 @@ using TrackMap.Api.Entities;
 using TrackMap.Common.Dtos.User;
 using TrackMap.Common.Requests.User;
 using TrackMap.Common.Responses;
+using TrackMap.Common.SeedWork;
 using YANLib;
 using static System.DateTime;
 using static System.Guid;
@@ -33,5 +34,7 @@ public sealed class UserMapper : Profile
         _ = CreateMap<User, UserResponse>();
 
         _ = CreateMap<User, UserDto>();
+
+        _ = CreateMap<PagedList<User>, PagedList<UserResponse>>();
     }
 }

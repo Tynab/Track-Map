@@ -1,6 +1,7 @@
 ﻿using TrackMap.Common.Dtos.Device;
 using TrackMap.Common.Requests.Device;
 using TrackMap.Common.Responses;
+using TrackMap.Common.SeedWork;
 
 namespace TrackMap.Services;
 
@@ -10,7 +11,7 @@ public interface IDeviceService
 
     public ValueTask<DeviceResponse?> Get(Guid id);
 
-    public ValueTask<List<DeviceResponse>?> Search(DeviceSearchDto? dto);
+    public ValueTask<PagedList<DeviceResponse>?> Search(DeviceSearchDto? dto);
 
     public ValueTask<bool> Create(DeviceCreateRequest? request);
 

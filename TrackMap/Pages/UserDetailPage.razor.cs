@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using TrackMap.Common.Dtos.Device;
 using TrackMap.Common.Responses;
+using TrackMap.Common.SeedWork;
 using TrackMap.Components;
 using TrackMap.Layout;
 using YANLib;
@@ -21,23 +22,8 @@ public sealed partial class UserDetailPage
 
             if (authenticationState.User.Identity is not null && authenticationState.User.Identity.IsAuthenticated && Id.IsNotWhiteSpaceAndNull())
             {
-                User = await UserService.Get(new Guid(Id));
-
-                Devices = User?.Devices?.Select(x => new DeviceResponse
-                {
-                    Id = x.Id,
-                    DeviceType = x.DeviceType,
-                    DeviceOs = x.DeviceOs,
-                    IpAddress = x.IpAddress,
-                    Latitude = x.Latitude,
-                    Longitude = x.Longitude,
-                    LastLogin = x.LastLogin,
-                    CreatedBy = x.CreatedBy,
-                    CreatedAt = x.CreatedAt,
-                    UpdatedBy = x.UpdatedBy,
-                    UpdatedAt = x.UpdatedAt,
-                    Status = x.Status
-                }).ToList();
+                User = await UserService.Get(new Guid(Id)).AsTask();
+                _ = await GetDevicesByUser();
             }
         }
         catch (Exception ex)
@@ -50,9 +36,10 @@ public sealed partial class UserDetailPage
     {
         try
         {
-            DeviceSearch.UserId = User?.Id;
-            Devices = await DeviceService.Search(DeviceSearch);
-            ToastService.ShowInfo("Seach completed");
+            if (await GetDevicesByUser())
+            {
+                ToastService.ShowInfo("Seach completed");
+            }
         }
         catch (Exception ex)
         {
@@ -60,7 +47,7 @@ public sealed partial class UserDetailPage
         }
     }
 
-    public void OnDeleteDevice(Guid id)
+    private void OnDeleteDevice(Guid id)
     {
         try
         {
@@ -73,15 +60,16 @@ public sealed partial class UserDetailPage
         }
     }
 
-    public async Task OnConfirmDeleteDevice(bool isComfirmed)
+    private async Task OnConfirmDeleteDevice(bool isComfirmed)
     {
         try
         {
             if (isComfirmed && await DeviceService.Delete(_deleteId))
             {
-                ToastService.ShowSuccess("Delete successful");
-                DeviceSearch.UserId = User?.Id;
-                Devices = await DeviceService.Search(DeviceSearch);
+                if (await GetDevicesByUser())
+                {
+                    ToastService.ShowSuccess("Delete successful");
+                }
             }
         }
         catch (Exception ex)
@@ -90,14 +78,51 @@ public sealed partial class UserDetailPage
         }
     }
 
-    [CascadingParameter]
-    private Error? Error { get; set; }
+    private async Task SelectedPage(int page)
+    {
+        try
+        {
+            DeviceSearch.PageNumber = page;
+            _ = await GetDevicesByUser();
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
+    }
+
+    private async ValueTask<bool> GetDevicesByUser()
+    {
+        try
+        {
+            DeviceSearch.UserId = User?.Id;
+
+            var pagingRes = await DeviceService.Search(DeviceSearch);
+
+            if (pagingRes is not null && pagingRes.MetaData is not null)
+            {
+                Devices = pagingRes.Items;
+                MetaData = pagingRes.MetaData;
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+
+            return false;
+        }
+    }
+
+    [Parameter]
+    public string? Id { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; }
 
-    [Parameter]
-    public string? Id { get; set; }
+    [CascadingParameter]
+    private Error? Error { get; set; }
 
     private List<DeviceResponse>? Devices { get; set; }
 
@@ -106,4 +131,6 @@ public sealed partial class UserDetailPage
     private UserResponse? User { get; set; }
 
     private DeviceSearchDto DeviceSearch { get; set; } = new DeviceSearchDto();
+
+    private MetaData MetaData { get; set; } = new MetaData();
 }

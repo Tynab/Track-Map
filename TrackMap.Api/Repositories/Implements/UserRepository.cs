@@ -2,6 +2,7 @@
 using TrackMap.Api.Data;
 using TrackMap.Api.Entities;
 using TrackMap.Common.Dtos.User;
+using TrackMap.Common.SeedWork;
 using YANLib;
 
 namespace TrackMap.Api.Repositories.Implements;
@@ -39,7 +40,7 @@ public sealed class UserRepository(ILogger<UserRepository> logger, TrackMapDbCon
         }
     }
 
-    public async ValueTask<IEnumerable<User>> Search(UserSearchDto dto)
+    public async ValueTask<PagedList<User>> Search(UserSearchDto dto)
     {
         try
         {
@@ -75,7 +76,12 @@ public sealed class UserRepository(ILogger<UserRepository> logger, TrackMapDbCon
                 qry = qry.Where(x => x.UpdatedBy == dto.UpdatedBy.Value);
             }
 
-            return await qry.OrderBy(x => x.FullName).Include(x => x.Devices).AsNoTracking().ToArrayAsync();
+            return new PagedList<User>(
+                await qry.OrderBy(x => x.FullName).Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize).Include(x => x.Devices).AsNoTracking().ToListAsync(),
+                await qry.CountAsync(),
+                dto.PageNumber,
+                dto.PageSize
+            );
         }
         catch (Exception ex)
         {

@@ -2,6 +2,7 @@
 using TrackMap.Api.Data;
 using TrackMap.Api.Entities;
 using TrackMap.Common.Dtos.Device;
+using TrackMap.Common.SeedWork;
 using YANLib;
 
 namespace TrackMap.Api.Repositories.Implements;
@@ -39,7 +40,7 @@ public sealed class DeviceRepository(ILogger<DeviceRepository> logger, TrackMapD
         }
     }
 
-    public async ValueTask<IEnumerable<Device>> Search(DeviceSearchDto dto)
+    public async ValueTask<PagedList<Device>> Search(DeviceSearchDto dto)
     {
         try
         {
@@ -92,7 +93,12 @@ public sealed class DeviceRepository(ILogger<DeviceRepository> logger, TrackMapD
                 qry = qry.Where(x => x.IsActive == act);
             }
 
-            return await qry.OrderByDescending(x => x.LastLogin).Include(x => x.User).AsNoTracking().ToArrayAsync();
+            return new PagedList<Device>(
+                await qry.OrderByDescending(x => x.LastLogin).Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize).Include(x => x.User).AsNoTracking().ToListAsync(),
+                await qry.CountAsync(),
+                dto.PageNumber,
+                dto.PageSize
+            );
         }
         catch (Exception ex)
         {

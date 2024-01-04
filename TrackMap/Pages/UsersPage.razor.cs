@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using TrackMap.Common.Dtos.User;
 using TrackMap.Common.Responses;
+using TrackMap.Common.SeedWork;
 using TrackMap.Components;
 using TrackMap.Layout;
 using static System.Threading.Tasks.Task;
@@ -22,11 +23,9 @@ public sealed partial class UsersPage
             if (authenticationState.User.Identity is not null && authenticationState.User.Identity.IsAuthenticated)
             {
                 var userTask = LocalStorageService.GetItemAsync<UserResponse>("profile").AsTask();
-                var usersTask = UserService.GetAll().AsTask();
 
-                await WhenAll(userTask, usersTask);
+                await WhenAll(userTask, GetUsers().AsTask());
                 User = await userTask;
-                Users = await usersTask;
 
                 if (authenticationState.User.IsInRole("Admin"))
                 {
@@ -44,8 +43,10 @@ public sealed partial class UsersPage
     {
         try
         {
-            Users = await UserService.Search(UserSearch);
-            ToastService.ShowInfo("Seach completed");
+            if (await GetUsers())
+            {
+                ToastService.ShowInfo("Seach completed");
+            }
         }
         catch (Exception ex)
         {
@@ -53,7 +54,7 @@ public sealed partial class UsersPage
         }
     }
 
-    public void OnDeleteUser(Guid id)
+    private void OnDeleteUser(Guid id)
     {
         try
         {
@@ -66,14 +67,16 @@ public sealed partial class UsersPage
         }
     }
 
-    public async Task OnConfirmDeleteUser(bool isConfirmed)
+    private async Task OnConfirmDeleteUser(bool isConfirmed)
     {
         try
         {
             if (isConfirmed && await UserService.Delete(_deleteId))
             {
-                ToastService.ShowSuccess("Delete successful");
-                Users = await UserService.Search(UserSearch);
+                if (await GetUsers())
+                {
+                    ToastService.ShowSuccess("Delete successful");
+                }
             }
         }
         catch (Exception ex)
@@ -82,11 +85,46 @@ public sealed partial class UsersPage
         }
     }
 
-    [CascadingParameter]
-    private Error? Error { get; set; }
+    private async Task SelectedPage(int page)
+    {
+        try
+        {
+            UserSearch.PageNumber = page;
+            _ = await GetUsers();
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+        }
+    }
+
+    private async ValueTask<bool> GetUsers()
+    {
+        try
+        {
+            var pagingRes = await UserService.Search(UserSearch);
+
+            if (pagingRes is not null && pagingRes.MetaData is not null)
+            {
+                Users = pagingRes.Items;
+                MetaData = pagingRes.MetaData;
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Error?.ProcessError(ex);
+
+            return false;
+        }
+    }
 
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    [CascadingParameter]
+    private Error? Error { get; set; }
 
     private List<UserResponse>? Users { get; set; }
 
@@ -95,6 +133,8 @@ public sealed partial class UsersPage
     private UserResponse? User { get; set; }
 
     private UserSearchDto UserSearch { get; set; } = new UserSearchDto();
+
+    private MetaData MetaData { get; set; } = new MetaData();
 
     private bool IsAdmin { get; set; } = false;
 }

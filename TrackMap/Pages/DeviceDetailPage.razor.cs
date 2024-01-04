@@ -25,14 +25,14 @@ public sealed partial class DeviceDetailPage
         }
     }
 
-    [CascadingParameter]
-    private Error? Error { get; set; }
-
     [Parameter]
     public string? Id { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    [CascadingParameter]
+    private Error? Error { get; set; }
 
     private DeviceResponse? Device { get; set; }
 }

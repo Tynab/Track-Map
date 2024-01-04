@@ -93,6 +93,10 @@ else
                 </tr>
             }
         </tbody>
+
+        <tfoot>
+            <Paginnation MetaData="MetaData" Spread="2" SelectedPage="SelectedPage"></Paginnation>
+        </tfoot>
     </table>
 
     <Confirmation ConfirmationMessage="Are you sure to delete it?" ConfirmationTitle="Delete User" @ref="DeleteConfirmation" ConfirmationChanged="OnConfirmDeleteUser" />

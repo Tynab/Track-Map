@@ -1,6 +1,8 @@
-﻿namespace TrackMap.Common.Dtos.User;
+﻿using TrackMap.Common.SeedWork;
 
-public sealed class UserSearchDto
+namespace TrackMap.Common.Dtos.User;
+
+public sealed class UserSearchDto : PagingParameters
 {
     public string? FullName { get; set; }
 

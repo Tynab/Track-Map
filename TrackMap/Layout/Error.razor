@@ -4,12 +4,12 @@
 <CascadingValue Value="this">@ChildContent</CascadingValue>
 
     @code {
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-
     public void ProcessError(Exception ex)
     {
         ToastService.ShowError("Error happen in progress");
         Logger.LogError("ErrorProcessError-Exception: {Type} ; {Message}", ex.GetType(), ex.Message);
     }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
 }

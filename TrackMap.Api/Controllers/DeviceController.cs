@@ -7,6 +7,7 @@ using TrackMap.Api.Repositories;
 using TrackMap.Common.Dtos.Device;
 using TrackMap.Common.Requests.Device;
 using TrackMap.Common.Responses;
+using TrackMap.Common.SeedWork;
 using YANLib;
 using static System.DateTime;
 
@@ -67,11 +68,11 @@ public sealed class DeviceController(ILogger<DeviceController> logger, IMapper m
 
     [HttpGet("search")]
     [SwaggerOperation(Summary = "Search Devices")]
-    public async ValueTask<IActionResult> Search([FromQuery] DeviceSearchDto? dto)
+    public async ValueTask<IActionResult> Search([FromQuery] DeviceSearchDto dto)
     {
         try
         {
-            return Ok(_mapper.Map<IEnumerable<DeviceResponse>>(dto is null ? await _repository.GetAll() : await _repository.Search(dto)));
+            return Ok(_mapper.Map<PagedList<DeviceResponse>>(await _repository.Search(dto)));
         }
         catch (Exception ex)
         {

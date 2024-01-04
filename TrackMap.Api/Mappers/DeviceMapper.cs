@@ -4,6 +4,7 @@ using TrackMap.Common.Dtos.Device;
 using TrackMap.Common.Enums;
 using TrackMap.Common.Requests.Device;
 using TrackMap.Common.Responses;
+using TrackMap.Common.SeedWork;
 using YANLib;
 using static System.DateTime;
 using static System.Guid;
@@ -33,5 +34,7 @@ public sealed class DeviceMapper : Profile
             .ForMember(d => d.DeviceType, o => o.MapFrom(s => s.DeviceType.IsWhiteSpaceOrNull() ? default : s.DeviceType.ToEnum<DeviceType>()))
             .ForMember(d => d.DeviceOs, o => o.MapFrom(s => s.DeviceOs.IsWhiteSpaceOrNull() ? default : s.DeviceOs.ToEnum<DeviceOs>()))
             .ForMember(d => d.Status, o => o.MapFrom(s => s.IsActive == true ? Status.Active : Status.Inactive));
+
+        _ = CreateMap<PagedList<Device>, PagedList<DeviceResponse>>();
     }
 }
