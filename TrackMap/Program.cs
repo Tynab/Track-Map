@@ -11,16 +11,16 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
-builder.Services.AddAuthorizationCore();
-builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddBlazorBootstrap();
-builder.Services.AddBlazoredToast();
-builder.Services.AddTransient<IAuthService, AuthService>();
-builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<IDeviceService, DeviceService>();
-builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
+_ = builder.Services.AddAuthorizationCore();
+_ = builder.Services.AddBlazoredLocalStorage();
+_ = builder.Services.AddBlazorBootstrap();
+_ = builder.Services.AddBlazoredToast();
+_ = builder.Services.AddTransient<IAuthService, AuthService>();
+_ = builder.Services.AddTransient<IUserService, UserService>();
+_ = builder.Services.AddTransient<IDeviceService, DeviceService>();
+_ = builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
 
-builder.Services.AddScoped(s => new HttpClient
+_ = builder.Services.AddScoped(s => new HttpClient
 {
     BaseAddress = new Uri(builder.Configuration["BackendApiUrl"] ?? "https://localhost:7083/")
 });
