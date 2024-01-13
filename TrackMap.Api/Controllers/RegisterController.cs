@@ -10,8 +10,8 @@ using static System.Guid;
 
 namespace TrackMap.Api.Controllers;
 
-[Route("api/register")]
 [ApiController]
+[Route("api/register")]
 public sealed class RegisterController(ILogger<RegisterController> logger, UserManager<User> userManager) : ControllerBase
 {
     private readonly ILogger<RegisterController> _logger = logger;

@@ -14,8 +14,8 @@ using static System.DateTime;
 
 namespace TrackMap.Api.Controllers;
 
-[Route("api/users")]
 [ApiController]
+[Route("api/users")]
 public sealed class UserController(ILogger<UserController> logger, IMapper mapper, IUserRepository repository) : ControllerBase
 {
     private readonly ILogger<UserController> _logger = logger;

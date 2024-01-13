@@ -13,8 +13,8 @@ using static System.DateTime;
 
 namespace TrackMap.Api.Controllers;
 
-[Route("api/devices")]
 [ApiController]
+[Route("api/devices")]
 public sealed class DeviceController(ILogger<DeviceController> logger, IMapper mapper, IDeviceRepository repository, IUserRepository userRepository) : ControllerBase
 {
     private readonly ILogger<DeviceController> _logger = logger;

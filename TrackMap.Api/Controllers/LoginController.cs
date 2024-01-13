@@ -16,8 +16,8 @@ using static System.Text.Encoding;
 
 namespace TrackMap.Api.Controllers;
 
-[Route("api/login")]
 [ApiController]
+[Route("api/login")]
 public sealed class LoginController(ILogger<UserController> logger, IConfiguration configuration, SignInManager<User> signInManager) : ControllerBase
 {
     private readonly ILogger<UserController> _logger = logger;
