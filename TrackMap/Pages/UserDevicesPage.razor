@@ -117,10 +117,6 @@ else
                             <StatusLabel Status="device.Status" />
                         </td>
 
-                        @* <td>
-                            <a href="/device-detail/@device.Id" class="btn btn-secondary">Detail</a>
-                            <a href="/user-detail/@device.User?.Id" class="btn btn-info">User</a>
-                        </td> *@
                         <td>
                             @if (device.Status is Active)
                             {
